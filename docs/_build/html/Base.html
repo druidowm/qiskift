@@ -1,0 +1,677 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>The BaseFaultTolerance Module &#8212; QiskiFT 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]]}})</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="The Steane Module" href="Steane.html" />
+    <link rel="prev" title="QiskiFT API" href="API.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Steane.html" title="The Steane Module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="API.html" title="QiskiFT API"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">QiskiFT 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="API.html" accesskey="U">QiskiFT API</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">The BaseFaultTolerance Module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="the-basefaulttolerance-module">
+<h1>The BaseFaultTolerance Module<a class="headerlink" href="#the-basefaulttolerance-module" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<span class="target" id="module-BaseFaultTolerance"></span><p>The BaseFaultTolerance module contains base classes for Quantum Error Correction and Quantum Fault Tolerance. 
+These classes are generic; they require the user to provide the relevant algorithms when they are initialized.
+For specific quantum codes, see the Codes page. Note that only the Steane code is currently implemented.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="BaseFaultTolerance.BaseFaultTolerantMeasurement">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">BaseFaultTolerance.</span></span><span class="sig-name descname"><span class="pre">BaseFaultTolerantMeasurement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#BaseFaultTolerantMeasurement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.BaseFaultTolerantMeasurement" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class for implementing fault-tolerant measurement. NOT YET IMPLEMENTED.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_analysis_pass</span></code></dt><dd><p>Check if the pass is an analysis pass.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_transformation_pass</span></code></dt><dd><p>Check if the pass is a transformation pass.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code>()</p></td>
+<td><p>Return the name of the pass.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code>(dag)</p></td>
+<td><p>Run a pass on the DAGCircuit.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="BaseFaultTolerance.Encoder">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">BaseFaultTolerance.</span></span><span class="sig-name descname"><span class="pre">Encoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoderCircuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numAncillas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#Encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.Encoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class for implementing the non-fault tolerant ecoding of the Steane <span class="math notranslate nohighlight">\(|0\rangle\)</span> state.</p>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 70%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>createEncoderCircuit :</strong></p></td>
+<td><p>Creates a circuit encoding the <span class="math notranslate nohighlight">\(|0\rangle\)</span> state</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>createEncoderDag :</strong></p></td>
+<td><p>Creates a DAG encoding the <span class="math notranslate nohighlight">\(|0\rangle\)</span> state</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>getEncoderCircuit :</strong></p></td>
+<td><p>Adds gates encoding the <span class="math notranslate nohighlight">\(|0\rangle\)</span> state to a circuit</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>getEncoderDag :</strong></p></td>
+<td><p>Adds gates encoding the <span class="math notranslate nohighlight">\(|0\rangle\)</span> state to a DAG</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.Encoder.createEncoderCircuit">
+<span class="sig-name descname"><span class="pre">createEncoderCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numQubits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#Encoder.createEncoderCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.Encoder.createEncoderCircuit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a circuit encoding the specified number of qubits to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>numQubits</strong><span class="classifier">int</span></dt><dd><p>The number of qubits to initialize to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.Encoder.createEncoderDag">
+<span class="sig-name descname"><span class="pre">createEncoderDag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numQubits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#Encoder.createEncoderDag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.Encoder.createEncoderDag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a DAG encoding the specified number of qubits to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>numQubits</strong><span class="classifier">int</span></dt><dd><p>The number of qubits to initialize to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.Encoder.getEncoderCircuit">
+<span class="sig-name descname"><span class="pre">getEncoderCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#Encoder.getEncoderCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.Encoder.getEncoderCircuit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encodes the specified Quantum Registers to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state for the given circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dag</strong><span class="classifier">DAGCircuit</span></dt><dd><p>The circuit for which to create the encoding.</p>
+</dd>
+<dt><strong>qregs</strong><span class="classifier">list(QuantumRegister)</span></dt><dd><p>The Quantum Registers to encode to the <span class="math notranslate nohighlight">\(|0\rangle\)</span>.</p>
+</dd>
+<dt><strong>cregs</strong><span class="classifier">list(ClassicalRegister), Optional</span></dt><dd><p>The Classical Registers used to encode to the <span class="math notranslate nohighlight">\(|0\rangle\)</span>, if classical registers are needed. If <code class="docutils literal notranslate"><span class="pre">cregs</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs)</span></code> and the encoding process for the <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">cregs[i]</span></code> classical register.</p>
+</dd>
+<dt><strong>ancillas</strong><span class="classifier">list(AncillaRegister), list(QuantumRegister), Optional</span></dt><dd><p>The Ancilla Registers used to encode to the <span class="math notranslate nohighlight">\(|0\rangle\)</span>, if ancilla registers are needed. If <code class="docutils literal notranslate"><span class="pre">ancillas</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(ancillas)</span> <span class="pre">==</span> <span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs)</span></code> and the encoding process for the <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">ancillas[i]</span></code> ancilla register.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.Encoder.getEncoderDag">
+<span class="sig-name descname"><span class="pre">getEncoderDag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#Encoder.getEncoderDag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.Encoder.getEncoderDag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encodes the specified Quantum Registers to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state for the given DAG.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dag</strong><span class="classifier">DAGCircuit</span></dt><dd><p>The circuit for which to create the encoding.</p>
+</dd>
+<dt><strong>qregs</strong><span class="classifier">list(QuantumRegister)</span></dt><dd><p>The Quantum Registers to encode to the <span class="math notranslate nohighlight">\(|0\rangle\)</span>.</p>
+</dd>
+<dt><strong>cregs</strong><span class="classifier">list(ClassicalRegister), Optional</span></dt><dd><p>The Classical Registers used to encode to the <span class="math notranslate nohighlight">\(|0\rangle\)</span>, if classical registers are needed. If <code class="docutils literal notranslate"><span class="pre">cregs</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs)</span></code> and the encoding process for the <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">cregs[i]</span></code> classical register.</p>
+</dd>
+<dt><strong>ancillas</strong><span class="classifier">list(AncillaRegister), list(QuantumRegister), Optional</span></dt><dd><p>The Ancilla Registers used to encode to the <span class="math notranslate nohighlight">\(|0\rangle\)</span>, if ancilla registers are needed. If <code class="docutils literal notranslate"><span class="pre">ancillas</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(ancillas)</span> <span class="pre">==</span> <span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs)</span></code> and the encoding process for the <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">ancillas[i]</span></code> ancilla register.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="BaseFaultTolerance.ErrorCorrector">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">BaseFaultTolerance.</span></span><span class="sig-name descname"><span class="pre">ErrorCorrector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">syndromeDetector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">syndromeCorrector</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#ErrorCorrector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.ErrorCorrector" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class for implementing non-fault tolerant error correction (syndrome detection and correction) for an arbitrary error correction scheme.
+This class combines <code class="xref py py-class docutils literal notranslate"><span class="pre">SyndromeDetection</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">SyndromeCorrection</span></code> into a single class for ease of use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>syndromeDetector</strong><span class="classifier">SyndromeDetector</span></dt><dd><p>An object representing syndrome detection.</p>
+</dd>
+<dt><strong>syndromeCorrector</strong><span class="classifier">SyndromeCorrector</span></dt><dd><p>An object representing syndrome correction.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 67%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>errorCorrectCircuit :</strong></p></td>
+<td><p>Implements error correction for the given circuit.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>errorCorrecDag :</strong></p></td>
+<td><p>Implements error correction for the given DAG.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.ErrorCorrector.errorCorrectCircuit">
+<span class="sig-name descname"><span class="pre">errorCorrectCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#ErrorCorrector.errorCorrectCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.ErrorCorrector.errorCorrectCircuit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates gates implementing fault tolerant error correction for the given qubits in the given circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>circuit</strong><span class="classifier">QuantumCircuit</span></dt><dd><p>The circuit for which to perform error correction.</p>
+</dd>
+<dt><strong>qregs</strong><span class="classifier">list(QuantumRegister)</span></dt><dd><p>The Quantum Registers to on which to perform error correction.</p>
+</dd>
+<dt><strong>cregs</strong><span class="classifier">list(ClassicalRegister)</span></dt><dd><p>The Classical Registers used to perform error correction, if classical registers are needed. If <code class="docutils literal notranslate"><span class="pre">cregs</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs)</span></code> and the syndrome correction process for the <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">cregs[i]</span></code> classical register.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.ErrorCorrector.errorCorrectDag">
+<span class="sig-name descname"><span class="pre">errorCorrectDag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#ErrorCorrector.errorCorrectDag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.ErrorCorrector.errorCorrectDag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates gates implementing non-fault tolerant error correction for the given qubits in the given DAG.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dag</strong><span class="classifier">DAGCircuit</span></dt><dd><p>The dag for which to perform error correction.</p>
+</dd>
+<dt><strong>qregs</strong><span class="classifier">list(QuantumRegister)</span></dt><dd><p>The Quantum Registers to on which to perform error correction.</p>
+</dd>
+<dt><strong>cregs</strong><span class="classifier">list(ClassicalRegister)</span></dt><dd><p>The Classical Registers used to perform error correction, if classical registers are needed. If <code class="docutils literal notranslate"><span class="pre">cregs</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs)</span></code> and the syndrome correction process for the <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">cregs[i]</span></code> classical register.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerance">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">BaseFaultTolerance.</span></span><span class="sig-name descname"><span class="pre">FaultTolerance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerance" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Transpiler pass that converts a given quantum computation into an equivalent one with error correction. NOT YET IMPLEMENTED</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_analysis_pass</span></code></dt><dd><p>Check if the pass is an analysis pass.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_transformation_pass</span></code></dt><dd><p>Check if the pass is a transformation pass.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code>()</p></td>
+<td><p>Return the name of the pass.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#BaseFaultTolerance.FaultTolerance.run" title="BaseFaultTolerance.FaultTolerance.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>()</p></td>
+<td><p>Run a pass on the DAGCircuit.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerance.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerance.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerance.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a pass on the DAGCircuit. This is implemented by the pass developer.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>dag (DAGCircuit): the dag on which the pass is run.</p>
+</dd>
+<dt>Raises:</dt><dd><p>NotImplementedError: when this is left unimplemented for a pass.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerantEncoder">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">BaseFaultTolerance.</span></span><span class="sig-name descname"><span class="pre">FaultTolerantEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkerCircuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numAncillas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correctVal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numRepeats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class for implementing an fault tolerant ecoding of the <span class="math notranslate nohighlight">\(|0\rangle\)</span> state for an arbitrary quantum code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>encoder</strong><span class="classifier">Encoder</span></dt><dd><p>An Encoder object representing the <span class="math notranslate nohighlight">\(|0\rangle\)</span> state non-fault tolerant encoding process.</p>
+</dd>
+<dt><strong>checkerCircuit</strong><span class="classifier">QuantumCircuit</span></dt><dd><p>A circuit for determining whether the <span class="math notranslate nohighlight">\(|0\rangle\)</span> state has been encoded properly.</p>
+</dd>
+<dt><strong>numAncillas</strong><span class="classifier">int</span></dt><dd><p>The number of ancilla qubits used to check the encoded effect. 
+Note: the ancilla qubits must be at the end of the list of qubits for the circuit.</p>
+</dd>
+<dt><strong>correctVal</strong><span class="classifier">int</span></dt><dd><p>The classical register value corresponding to the correct initialization of the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state.</p>
+</dd>
+<dt><strong>numRepeats</strong><span class="classifier">int</span></dt><dd><p>The number of times to attempt to create the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 70%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>createEncoderCircuit :</strong></p></td>
+<td><p>Creates a circuit encoding the <span class="math notranslate nohighlight">\(|0\rangle\)</span> state</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>createEncoderDag :</strong></p></td>
+<td><p>Creates a DAG encoding the <span class="math notranslate nohighlight">\(|0\rangle\)</span> state</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>getEncoderCircuit :</strong></p></td>
+<td><p>Adds gates encoding the <span class="math notranslate nohighlight">\(|0\rangle\)</span> state to a circuit</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>getEncoderDag :</strong></p></td>
+<td><p>Adds gates encoding the <span class="math notranslate nohighlight">\(|0\rangle\)</span> state to a DAG</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerantEncoder.createEncoderCircuit">
+<span class="sig-name descname"><span class="pre">createEncoderCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numQubits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantEncoder.createEncoderCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantEncoder.createEncoderCircuit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a circuit fault-tolerantly encoding the specified number of qubits to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>numQubits</strong><span class="classifier">int</span></dt><dd><p>The number of qubits to initialize to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerantEncoder.createEncoderDag">
+<span class="sig-name descname"><span class="pre">createEncoderDag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numQubits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantEncoder.createEncoderDag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantEncoder.createEncoderDag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a DAG fault-tolerantly encoding the specified number of qubits to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>numQubits</strong><span class="classifier">int</span></dt><dd><p>The number of qubits to initialize to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerantEncoder.getEncoderCircuit">
+<span class="sig-name descname"><span class="pre">getEncoderCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantEncoder.getEncoderCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantEncoder.getEncoderCircuit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fault-tolerantly encodes the specified Quantum Registers to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state for the given circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dag</strong><span class="classifier">DAGCircuit</span></dt><dd><p>The circuit for which to create the encoding.</p>
+</dd>
+<dt><strong>qregs</strong><span class="classifier">list(QuantumRegister)</span></dt><dd><p>The Quantum Registers to encode to the <span class="math notranslate nohighlight">\(|0\rangle\)</span>.</p>
+</dd>
+<dt><strong>cregs</strong><span class="classifier">list(ClassicalRegister), Optional</span></dt><dd><p>The Classical Registers used to encode to the <span class="math notranslate nohighlight">\(|0\rangle\)</span>, if classical registers are needed. If <code class="docutils literal notranslate"><span class="pre">cregs</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs)</span></code> and the encoding process for the <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">cregs[i]</span></code> classical register.</p>
+</dd>
+<dt><strong>ancillas</strong><span class="classifier">list(AncillaRegister), list(QuantumRegister), Optional</span></dt><dd><p>The Ancilla Registers used to encode to the <span class="math notranslate nohighlight">\(|0\rangle\)</span>, if ancilla registers are needed. If <code class="docutils literal notranslate"><span class="pre">ancillas</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(ancillas)</span> <span class="pre">==</span> <span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs)</span></code> and the encoding process for the <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">ancillas[i]</span></code> ancilla register.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerantEncoder.getEncoderDag">
+<span class="sig-name descname"><span class="pre">getEncoderDag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantEncoder.getEncoderDag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantEncoder.getEncoderDag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fault-tolerantly encodes the specified Quantum Registers to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state for the given DAG.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dag</strong><span class="classifier">DAGCircuit</span></dt><dd><p>The circuit for which to create the encoding.</p>
+</dd>
+<dt><strong>qregs</strong><span class="classifier">list(QuantumRegister)</span></dt><dd><p>The Quantum Registers to encode to the <span class="math notranslate nohighlight">\(|0\rangle\)</span>.</p>
+</dd>
+<dt><strong>cregs</strong><span class="classifier">list(ClassicalRegister), Optional</span></dt><dd><p>The Classical Registers used to encode to the <span class="math notranslate nohighlight">\(|0\rangle\)</span>, if classical registers are needed. If <code class="docutils literal notranslate"><span class="pre">cregs</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs)</span></code> and the encoding process for the <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">cregs[i]</span></code> classical register.</p>
+</dd>
+<dt><strong>ancillas</strong><span class="classifier">list(AncillaRegister), list(QuantumRegister), Optional</span></dt><dd><p>The Ancilla Registers used to encode to the <span class="math notranslate nohighlight">\(|0\rangle\)</span>, if ancilla registers are needed. If <code class="docutils literal notranslate"><span class="pre">ancillas</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(ancillas)</span> <span class="pre">==</span> <span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs)</span></code> and the encoding process for the <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">ancillas[i]</span></code> ancilla register.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerantGates">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">BaseFaultTolerance.</span></span><span class="sig-name descname"><span class="pre">FaultTolerantGates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gatesToCircuit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantGates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantGates" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class for implementing fault tolerant gates for an arbitrary quantum error correction code.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gatesToCircuit</strong><span class="classifier">map(str, (QuantumCircuit, int))</span></dt><dd><p>A map representing conversions between gates and circuits implementing fault tolerant versions of those gates. 
+The keys of the map are the QASM label for the gate in question, given by <code class="docutils literal notranslate"><span class="pre">gate.qasm()</span></code>.
+The outputs of the map are tuples of the form <code class="docutils literal notranslate"><span class="pre">(circuit,</span> <span class="pre">numAncillas)</span></code>, where <code class="docutils literal notranslate"><span class="pre">circuit</span></code> is a fault-tolerant implementation of a gate and <code class="docutils literal notranslate"><span class="pre">numAncillas</span></code> is the number of ancillas qubits used in the fault-tolerant implementation of the gate.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 71%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>addGateCircuit :</strong></p></td>
+<td><p>Adds a fault tolerant gate to the given circuit.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>addGateDag :</strong></p></td>
+<td><p>Adds a fault tolerant gate to the given DAG.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerantGates.addGateCircuit">
+<span class="sig-name descname"><span class="pre">addGateCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantGates.addGateCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantGates.addGateCircuit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the specified number of fault tolerant implementations of a quantum gate to the given circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>circuit</strong><span class="classifier">QuantumCircuit</span></dt><dd><p>The circuit on which to perform the fault tolerant gate.</p>
+</dd>
+<dt><strong>gate</strong><span class="classifier">Gate</span></dt><dd><p>The non-fault tolerant gate for which to implement a fault tolerant version.</p>
+</dd>
+<dt><strong>qregs</strong><span class="classifier">list(list(QuantumRegister))</span></dt><dd><p>The Quantum Registers to on which to perform the fault tolerant gate. Each <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> represents the list of quantum registers which correspond to the ith input to the non-fault tolerant version of the gate in question. Note that each <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> must have the same length.</p>
+</dd>
+<dt><strong>cregs</strong><span class="classifier">list(list(ClassicalRegister)), Optional</span></dt><dd><p>The Classical Registers used to perform syndrome detection, if classical registers are needed. If <code class="docutils literal notranslate"><span class="pre">cregs</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs[0])</span></code> and the syndrome detection process for the <code class="docutils literal notranslate"><span class="pre">qregs[i][j]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">cregs[j]</span></code> classical register.</p>
+</dd>
+<dt><strong>ancillas</strong><span class="classifier">list(list(AncillaRegister)), list(list(QuantumRegister)), Optional</span></dt><dd><p>The Ancilla Registers used to perform syndrome detection,, if ancilla registers are needed. If <code class="docutils literal notranslate"><span class="pre">ancillas</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(ancillas)</span> <span class="pre">==</span> <span class="pre">len(qregs[0])</span></code> and the syndrome detection process for the <code class="docutils literal notranslate"><span class="pre">qregs[i][j]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">ancillas[j]</span></code> ancilla register.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerantGates.addGateDag">
+<span class="sig-name descname"><span class="pre">addGateDag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantGates.addGateDag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantGates.addGateDag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds the specified number of fault tolerant implementations of a quantum gate to the given DAG.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dag</strong><span class="classifier">DAGCircuit</span></dt><dd><p>The dag on which to perform the fault tolerant gate.</p>
+</dd>
+<dt><strong>gate</strong><span class="classifier">Gate</span></dt><dd><p>The non-fault tolerant gate for which to implement a fault tolerant version.</p>
+</dd>
+<dt><strong>qregs</strong><span class="classifier">list(list(QuantumRegister))</span></dt><dd><p>The Quantum Registers to on which to perform the fault tolerant gate. Each <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> represents the list of quantum registers which correspond to the ith input to the non-fault tolerant version of the gate in question. Note that each <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> must have the same length.</p>
+</dd>
+<dt><strong>cregs</strong><span class="classifier">list(list(ClassicalRegister)), Optional</span></dt><dd><p>The Classical Registers used to perform syndrome detection, if classical registers are needed. If <code class="docutils literal notranslate"><span class="pre">cregs</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs[0])</span></code> and the syndrome detection process for the <code class="docutils literal notranslate"><span class="pre">qregs[i][j]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">cregs[j]</span></code> classical register.</p>
+</dd>
+<dt><strong>ancillas</strong><span class="classifier">list(list(AncillaRegister)), list(list(QuantumRegister)), Optional</span></dt><dd><p>The Ancilla Registers used to perform syndrome detection,, if ancilla registers are needed. If <code class="docutils literal notranslate"><span class="pre">ancillas</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(ancillas)</span> <span class="pre">==</span> <span class="pre">len(qregs[0])</span></code> and the syndrome detection process for the <code class="docutils literal notranslate"><span class="pre">qregs[i][j]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">ancillas[j]</span></code> ancilla register.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="BaseFaultTolerance.SyndromeCorrector">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">BaseFaultTolerance.</span></span><span class="sig-name descname"><span class="pre">SyndromeCorrector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">correctorCircuit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeCorrector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeCorrector" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class for implementing fault tolerant syndrome correction for an arbitrary error correction scheme.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>correctorCircuit</strong><span class="classifier">QuantumCircuit</span></dt><dd><p>A Quantum Circuit implementing fault tolerant syndrome correction for a single qubit.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 65%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>syndromeCorrectCircuit :</strong></p></td>
+<td><p>Implements syndrome correction for the given circuit.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>syndromeCorrectDag :</strong></p></td>
+<td><p>Implements syndrome correction for the given DAG.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.SyndromeCorrector.syndromeCorrectCircuit">
+<span class="sig-name descname"><span class="pre">syndromeCorrectCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeCorrector.syndromeCorrectCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeCorrector.syndromeCorrectCircuit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates gates implementing fault tolerant syndrome correction for the given qubits in the given circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>circuit</strong><span class="classifier">QuantumCircuit</span></dt><dd><p>The circuit for which to perform syndrome correction.</p>
+</dd>
+<dt><strong>qregs</strong><span class="classifier">list(QuantumRegister)</span></dt><dd><p>The Quantum Registers to on which to perform syndrome correction.</p>
+</dd>
+<dt><strong>cregs</strong><span class="classifier">list(ClassicalRegister)</span></dt><dd><p>The Classical Registers used to perform syndrome correction, if classical registers are needed. If <code class="docutils literal notranslate"><span class="pre">cregs</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs)</span></code> and the syndrome correction process for the <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">cregs[i]</span></code> classical register.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.SyndromeCorrector.syndromeCorrectDag">
+<span class="sig-name descname"><span class="pre">syndromeCorrectDag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeCorrector.syndromeCorrectDag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeCorrector.syndromeCorrectDag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates gates implementing fault tolerant syndrome correction for the given qubits in the given DAG.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dag</strong><span class="classifier">DAGCircuit</span></dt><dd><p>The dag for which to perform syndrome correction.</p>
+</dd>
+<dt><strong>qregs</strong><span class="classifier">list(QuantumRegister)</span></dt><dd><p>The Quantum Registers to on which to perform syndrome correction.</p>
+</dd>
+<dt><strong>cregs</strong><span class="classifier">list(ClassicalRegister)</span></dt><dd><p>The Classical Registers used to perform syndrome correction, if classical registers are needed. If <code class="docutils literal notranslate"><span class="pre">cregs</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs)</span></code> and the syndrome correction process for the <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">cregs[i]</span></code> classical register.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="BaseFaultTolerance.SyndromeDetector">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">BaseFaultTolerance.</span></span><span class="sig-name descname"><span class="pre">SyndromeDetector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detectorCircuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numAncillas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeDetector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeDetector" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class for implementing non-fault tolerant syndrome detection for an arbitrary error correction scheme.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>detectorCircuit</strong><span class="classifier">QuantumCircuit</span></dt><dd><p>A Quantum Circuit implementing non-fault tolerant syndrome detection.</p>
+</dd>
+<dt><strong>numAncillas</strong><span class="classifier">int</span></dt><dd><p>The number of ancilla qubits used in the syndrome detection.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 66%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>syndromeDetectCircuit :</strong></p></td>
+<td><p>Implements syndrome detection for the given circuit.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>syndromeDetectDag :</strong></p></td>
+<td><p>Implements syndrome detection for the given DAG.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.SyndromeDetector.syndromeDetectCircuit">
+<span class="sig-name descname"><span class="pre">syndromeDetectCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeDetector.syndromeDetectCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeDetector.syndromeDetectCircuit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates gates implementing non-fault tolerant syndrome detection for the given qubits in the given circuit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>circuit</strong><span class="classifier">QuantumCircuit</span></dt><dd><p>The circuit for which to perform syndrome detection.</p>
+</dd>
+<dt><strong>qregs</strong><span class="classifier">list(QuantumRegister)</span></dt><dd><p>The Quantum Registers to on which to perform syndrome detection.</p>
+</dd>
+<dt><strong>cregs</strong><span class="classifier">list(ClassicalRegister), Optional</span></dt><dd><p>The Classical Registers used to perform syndrome detection, if classical registers are needed. If <code class="docutils literal notranslate"><span class="pre">cregs</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs)</span></code> and the syndrome detection process for the <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">cregs[i]</span></code> classical register.</p>
+</dd>
+<dt><strong>ancillas</strong><span class="classifier">list(AncillaRegister), list(QuantumRegister), Optional</span></dt><dd><p>The Ancilla Registers used to perform syndrome detection,, if ancilla registers are needed. If <code class="docutils literal notranslate"><span class="pre">ancillas</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(ancillas)</span> <span class="pre">==</span> <span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs)</span></code> and the syndrome detection process for the <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">ancillas[i]</span></code> ancilla register.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="BaseFaultTolerance.SyndromeDetector.syndromeDetectDag">
+<span class="sig-name descname"><span class="pre">syndromeDetectDag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeDetector.syndromeDetectDag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeDetector.syndromeDetectDag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates gates implementing non-fault tolerant syndrome detection for the given qubits in the given DAG.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dag</strong><span class="classifier">DAGCircuit</span></dt><dd><p>The DAG for which to perform syndrome detection.</p>
+</dd>
+<dt><strong>qregs</strong><span class="classifier">list(QuantumRegister)</span></dt><dd><p>The Quantum Registers to on which to perform syndrome detection.</p>
+</dd>
+<dt><strong>cregs</strong><span class="classifier">list(ClassicalRegister), Optional</span></dt><dd><p>The Classical Registers used to perform syndrome detection, if classical registers are needed. If <code class="docutils literal notranslate"><span class="pre">cregs</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs)</span></code> and the syndrome detection process for the <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">cregs[i]</span></code> classical register.</p>
+</dd>
+<dt><strong>ancillas</strong><span class="classifier">list(AncillaRegister), list(QuantumRegister), Optional</span></dt><dd><p>The Ancilla Registers used to perform syndrome detection,, if ancilla registers are needed. If <code class="docutils literal notranslate"><span class="pre">ancillas</span></code> is provided, it must satisfy <code class="docutils literal notranslate"><span class="pre">len(ancillas)</span> <span class="pre">==</span> <span class="pre">len(cregs)</span> <span class="pre">==</span> <span class="pre">len(qregs)</span></code> and the syndrome detection process for the <code class="docutils literal notranslate"><span class="pre">qregs[i]</span></code> quantum register will use the <code class="docutils literal notranslate"><span class="pre">ancillas[i]</span></code> ancilla register.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="API.html"
+                        title="previous chapter">QiskiFT API</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Steane.html"
+                        title="next chapter">The Steane Module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Base.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Steane.html" title="The Steane Module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="API.html" title="QiskiFT API"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">QiskiFT 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="API.html" >QiskiFT API</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">The BaseFaultTolerance Module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Owen Dugan.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.0.
+    </div>
+  </body>
+</html>
