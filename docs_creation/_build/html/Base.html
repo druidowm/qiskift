@@ -4,49 +4,179 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The BaseFaultTolerance Module &#8212; QiskiFT 1.0.0 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    
+  <link href="_static/css/theme.css" rel="stylesheet" />
+  <link href="_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]]}})</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="The Steane Module" href="Steane.html" />
-    <link rel="prev" title="QiskiFT API" href="API.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="Steane.html" title="The Steane Module"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="API.html" title="QiskiFT API"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">QiskiFT 1.0.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="API.html" accesskey="U">QiskiFT API</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">The BaseFaultTolerance Module</a></li> 
-      </ul>
-    </div>  
+    <link rel="prev" title="QiskiFT API" href="API.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="index.html">
+<p class="title">QiskiFT</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="API.html">
+  QiskiFT API
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/druidowm/qiskift" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
             
-  <section id="the-basefaulttolerance-module">
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <p class="caption">
+ <span class="caption-text">
+  Contents:
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active has-children">
+  <a class="current reference internal" href="#">
+   The BaseFaultTolerance Module
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="simple">
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="Steane.html">
+   The Steane Module
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="simple">
+  </ul>
+ </li>
+</ul>
+
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <div class="section" id="the-basefaulttolerance-module">
 <h1>The BaseFaultTolerance Module<a class="headerlink" href="#the-basefaulttolerance-module" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
@@ -54,8 +184,8 @@
 These classes are generic; they require the user to provide the relevant algorithms when they are initialized.
 For specific quantum codes, see the Codes page. Note that only the Steane code is currently implemented.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="BaseFaultTolerance.BaseFaultTolerantMeasurement">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">BaseFaultTolerance.</span></span><span class="sig-name descname"><span class="pre">BaseFaultTolerantMeasurement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#BaseFaultTolerantMeasurement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.BaseFaultTolerantMeasurement" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.BaseFaultTolerantMeasurement">
+<em class="property">class </em><code class="sig-prename descclassname">BaseFaultTolerance.</code><code class="sig-name descname">BaseFaultTolerantMeasurement</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#BaseFaultTolerantMeasurement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.BaseFaultTolerantMeasurement" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class for implementing fault-tolerant measurement. NOT YET IMPLEMENTED.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Attributes</dt>
@@ -68,7 +198,7 @@ For specific quantum codes, see the Codes page. Note that only the Steane code i
 </dd>
 </dl>
 <p class="rubric">Methods</p>
-<table class="longtable docutils align-default">
+<table class="longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -85,11 +215,11 @@ For specific quantum codes, see the Codes page. Note that only the Steane code i
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="BaseFaultTolerance.Encoder">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">BaseFaultTolerance.</span></span><span class="sig-name descname"><span class="pre">Encoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoderCircuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numAncillas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#Encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.Encoder" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.Encoder">
+<em class="property">class </em><code class="sig-prename descclassname">BaseFaultTolerance.</code><code class="sig-name descname">Encoder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">encoderCircuit</span></em>, <em class="sig-param"><span class="n">numAncillas</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#Encoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.Encoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class for implementing the non-fault tolerant ecoding of the Steane <span class="math notranslate nohighlight">\(|0\rangle\)</span> state.</p>
 <p class="rubric">Methods</p>
-<table class="docutils align-default">
+<table class="table">
 <colgroup>
 <col style="width: 30%" />
 <col style="width: 70%" />
@@ -110,8 +240,8 @@ For specific quantum codes, see the Codes page. Note that only the Steane code i
 </tbody>
 </table>
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.Encoder.createEncoderCircuit">
-<span class="sig-name descname"><span class="pre">createEncoderCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numQubits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#Encoder.createEncoderCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.Encoder.createEncoderCircuit" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.Encoder.createEncoderCircuit">
+<code class="sig-name descname">createEncoderCircuit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">numQubits</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#Encoder.createEncoderCircuit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.Encoder.createEncoderCircuit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a circuit encoding the specified number of qubits to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -124,8 +254,8 @@ For specific quantum codes, see the Codes page. Note that only the Steane code i
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.Encoder.createEncoderDag">
-<span class="sig-name descname"><span class="pre">createEncoderDag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numQubits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#Encoder.createEncoderDag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.Encoder.createEncoderDag" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.Encoder.createEncoderDag">
+<code class="sig-name descname">createEncoderDag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">numQubits</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#Encoder.createEncoderDag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.Encoder.createEncoderDag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a DAG encoding the specified number of qubits to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -138,8 +268,8 @@ For specific quantum codes, see the Codes page. Note that only the Steane code i
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.Encoder.getEncoderCircuit">
-<span class="sig-name descname"><span class="pre">getEncoderCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#Encoder.getEncoderCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.Encoder.getEncoderCircuit" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.Encoder.getEncoderCircuit">
+<code class="sig-name descname">getEncoderCircuit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">circuit</span></em>, <em class="sig-param"><span class="n">qregs</span></em>, <em class="sig-param"><span class="n">cregs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ancillas</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#Encoder.getEncoderCircuit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.Encoder.getEncoderCircuit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encodes the specified Quantum Registers to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state for the given circuit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -158,8 +288,8 @@ For specific quantum codes, see the Codes page. Note that only the Steane code i
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.Encoder.getEncoderDag">
-<span class="sig-name descname"><span class="pre">getEncoderDag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#Encoder.getEncoderDag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.Encoder.getEncoderDag" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.Encoder.getEncoderDag">
+<code class="sig-name descname">getEncoderDag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dag</span></em>, <em class="sig-param"><span class="n">qregs</span></em>, <em class="sig-param"><span class="n">cregs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ancillas</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#Encoder.getEncoderDag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.Encoder.getEncoderDag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encodes the specified Quantum Registers to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state for the given DAG.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -180,8 +310,8 @@ For specific quantum codes, see the Codes page. Note that only the Steane code i
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="BaseFaultTolerance.ErrorCorrector">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">BaseFaultTolerance.</span></span><span class="sig-name descname"><span class="pre">ErrorCorrector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">syndromeDetector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">syndromeCorrector</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#ErrorCorrector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.ErrorCorrector" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.ErrorCorrector">
+<em class="property">class </em><code class="sig-prename descclassname">BaseFaultTolerance.</code><code class="sig-name descname">ErrorCorrector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">syndromeDetector</span></em>, <em class="sig-param"><span class="n">syndromeCorrector</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#ErrorCorrector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.ErrorCorrector" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class for implementing non-fault tolerant error correction (syndrome detection and correction) for an arbitrary error correction scheme.
 This class combines <code class="xref py py-class docutils literal notranslate"><span class="pre">SyndromeDetection</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">SyndromeCorrection</span></code> into a single class for ease of use.</p>
 <dl class="field-list simple">
@@ -195,7 +325,7 @@ This class combines <code class="xref py py-class docutils literal notranslate">
 </dd>
 </dl>
 <p class="rubric">Methods</p>
-<table class="docutils align-default">
+<table class="table">
 <colgroup>
 <col style="width: 33%" />
 <col style="width: 67%" />
@@ -210,8 +340,8 @@ This class combines <code class="xref py py-class docutils literal notranslate">
 </tbody>
 </table>
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.ErrorCorrector.errorCorrectCircuit">
-<span class="sig-name descname"><span class="pre">errorCorrectCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#ErrorCorrector.errorCorrectCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.ErrorCorrector.errorCorrectCircuit" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.ErrorCorrector.errorCorrectCircuit">
+<code class="sig-name descname">errorCorrectCircuit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">circuit</span></em>, <em class="sig-param"><span class="n">qregs</span></em>, <em class="sig-param"><span class="n">cregs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ancillas</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#ErrorCorrector.errorCorrectCircuit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.ErrorCorrector.errorCorrectCircuit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates gates implementing fault tolerant error correction for the given qubits in the given circuit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -228,8 +358,8 @@ This class combines <code class="xref py py-class docutils literal notranslate">
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.ErrorCorrector.errorCorrectDag">
-<span class="sig-name descname"><span class="pre">errorCorrectDag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#ErrorCorrector.errorCorrectDag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.ErrorCorrector.errorCorrectDag" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.ErrorCorrector.errorCorrectDag">
+<code class="sig-name descname">errorCorrectDag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dag</span></em>, <em class="sig-param"><span class="n">qregs</span></em>, <em class="sig-param"><span class="n">cregs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ancillas</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#ErrorCorrector.errorCorrectDag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.ErrorCorrector.errorCorrectDag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates gates implementing non-fault tolerant error correction for the given qubits in the given DAG.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -248,8 +378,8 @@ This class combines <code class="xref py py-class docutils literal notranslate">
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerance">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">BaseFaultTolerance.</span></span><span class="sig-name descname"><span class="pre">FaultTolerance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerance" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.FaultTolerance">
+<em class="property">class </em><code class="sig-prename descclassname">BaseFaultTolerance.</code><code class="sig-name descname">FaultTolerance</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerance" title="Permalink to this definition">¶</a></dt>
 <dd><p>A Transpiler pass that converts a given quantum computation into an equivalent one with error correction. NOT YET IMPLEMENTED</p>
 <dl class="field-list simple">
 <dt class="field-odd">Attributes</dt>
@@ -262,7 +392,7 @@ This class combines <code class="xref py py-class docutils literal notranslate">
 </dd>
 </dl>
 <p class="rubric">Methods</p>
-<table class="longtable docutils align-default">
+<table class="longtable table autosummary">
 <colgroup>
 <col style="width: 10%" />
 <col style="width: 90%" />
@@ -277,8 +407,8 @@ This class combines <code class="xref py py-class docutils literal notranslate">
 </tbody>
 </table>
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerance.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerance.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerance.run" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.FaultTolerance.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerance.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerance.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run a pass on the DAGCircuit. This is implemented by the pass developer.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>dag (DAGCircuit): the dag on which the pass is run.</p>
@@ -291,8 +421,8 @@ This class combines <code class="xref py py-class docutils literal notranslate">
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerantEncoder">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">BaseFaultTolerance.</span></span><span class="sig-name descname"><span class="pre">FaultTolerantEncoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkerCircuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numAncillas</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correctVal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numRepeats</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantEncoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantEncoder" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.FaultTolerantEncoder">
+<em class="property">class </em><code class="sig-prename descclassname">BaseFaultTolerance.</code><code class="sig-name descname">FaultTolerantEncoder</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">encoder</span></em>, <em class="sig-param"><span class="n">checkerCircuit</span></em>, <em class="sig-param"><span class="n">numAncillas</span></em>, <em class="sig-param"><span class="n">correctVal</span></em>, <em class="sig-param"><span class="n">numRepeats</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantEncoder" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class for implementing an fault tolerant ecoding of the <span class="math notranslate nohighlight">\(|0\rangle\)</span> state for an arbitrary quantum code.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -312,7 +442,7 @@ Note: the ancilla qubits must be at the end of the list of qubits for the circui
 </dd>
 </dl>
 <p class="rubric">Methods</p>
-<table class="docutils align-default">
+<table class="table">
 <colgroup>
 <col style="width: 30%" />
 <col style="width: 70%" />
@@ -333,8 +463,8 @@ Note: the ancilla qubits must be at the end of the list of qubits for the circui
 </tbody>
 </table>
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerantEncoder.createEncoderCircuit">
-<span class="sig-name descname"><span class="pre">createEncoderCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numQubits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantEncoder.createEncoderCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantEncoder.createEncoderCircuit" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.FaultTolerantEncoder.createEncoderCircuit">
+<code class="sig-name descname">createEncoderCircuit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">numQubits</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantEncoder.createEncoderCircuit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantEncoder.createEncoderCircuit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a circuit fault-tolerantly encoding the specified number of qubits to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -347,8 +477,8 @@ Note: the ancilla qubits must be at the end of the list of qubits for the circui
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerantEncoder.createEncoderDag">
-<span class="sig-name descname"><span class="pre">createEncoderDag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numQubits</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantEncoder.createEncoderDag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantEncoder.createEncoderDag" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.FaultTolerantEncoder.createEncoderDag">
+<code class="sig-name descname">createEncoderDag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">numQubits</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantEncoder.createEncoderDag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantEncoder.createEncoderDag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a DAG fault-tolerantly encoding the specified number of qubits to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -361,8 +491,8 @@ Note: the ancilla qubits must be at the end of the list of qubits for the circui
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerantEncoder.getEncoderCircuit">
-<span class="sig-name descname"><span class="pre">getEncoderCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantEncoder.getEncoderCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantEncoder.getEncoderCircuit" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.FaultTolerantEncoder.getEncoderCircuit">
+<code class="sig-name descname">getEncoderCircuit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">circuit</span></em>, <em class="sig-param"><span class="n">qregs</span></em>, <em class="sig-param"><span class="n">cregs1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ancillas1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cregs2</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ancillas2</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantEncoder.getEncoderCircuit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantEncoder.getEncoderCircuit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fault-tolerantly encodes the specified Quantum Registers to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state for the given circuit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -381,8 +511,8 @@ Note: the ancilla qubits must be at the end of the list of qubits for the circui
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerantEncoder.getEncoderDag">
-<span class="sig-name descname"><span class="pre">getEncoderDag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantEncoder.getEncoderDag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantEncoder.getEncoderDag" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.FaultTolerantEncoder.getEncoderDag">
+<code class="sig-name descname">getEncoderDag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dag</span></em>, <em class="sig-param"><span class="n">qregs</span></em>, <em class="sig-param"><span class="n">cregs1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ancillas1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cregs2</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ancillas2</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantEncoder.getEncoderDag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantEncoder.getEncoderDag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fault-tolerantly encodes the specified Quantum Registers to the encoded <span class="math notranslate nohighlight">\(|0\rangle\)</span> state for the given DAG.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -403,8 +533,8 @@ Note: the ancilla qubits must be at the end of the list of qubits for the circui
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerantGates">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">BaseFaultTolerance.</span></span><span class="sig-name descname"><span class="pre">FaultTolerantGates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gatesToCircuit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantGates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantGates" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.FaultTolerantGates">
+<em class="property">class </em><code class="sig-prename descclassname">BaseFaultTolerance.</code><code class="sig-name descname">FaultTolerantGates</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gatesToCircuit</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantGates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantGates" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class for implementing fault tolerant gates for an arbitrary quantum error correction code.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -417,7 +547,7 @@ The outputs of the map are tuples of the form <code class="docutils literal notr
 </dd>
 </dl>
 <p class="rubric">Methods</p>
-<table class="docutils align-default">
+<table class="table">
 <colgroup>
 <col style="width: 29%" />
 <col style="width: 71%" />
@@ -432,8 +562,8 @@ The outputs of the map are tuples of the form <code class="docutils literal notr
 </tbody>
 </table>
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerantGates.addGateCircuit">
-<span class="sig-name descname"><span class="pre">addGateCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantGates.addGateCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantGates.addGateCircuit" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.FaultTolerantGates.addGateCircuit">
+<code class="sig-name descname">addGateCircuit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">circuit</span></em>, <em class="sig-param"><span class="n">gate</span></em>, <em class="sig-param"><span class="n">qregs</span></em>, <em class="sig-param"><span class="n">cregs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ancillas</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantGates.addGateCircuit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantGates.addGateCircuit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds the specified number of fault tolerant implementations of a quantum gate to the given circuit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -454,8 +584,8 @@ The outputs of the map are tuples of the form <code class="docutils literal notr
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.FaultTolerantGates.addGateDag">
-<span class="sig-name descname"><span class="pre">addGateDag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantGates.addGateDag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantGates.addGateDag" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.FaultTolerantGates.addGateDag">
+<code class="sig-name descname">addGateDag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dag</span></em>, <em class="sig-param"><span class="n">gate</span></em>, <em class="sig-param"><span class="n">qregs</span></em>, <em class="sig-param"><span class="n">cregs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ancillas</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#FaultTolerantGates.addGateDag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.FaultTolerantGates.addGateDag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds the specified number of fault tolerant implementations of a quantum gate to the given DAG.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -478,8 +608,8 @@ The outputs of the map are tuples of the form <code class="docutils literal notr
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="BaseFaultTolerance.SyndromeCorrector">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">BaseFaultTolerance.</span></span><span class="sig-name descname"><span class="pre">SyndromeCorrector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">correctorCircuit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeCorrector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeCorrector" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.SyndromeCorrector">
+<em class="property">class </em><code class="sig-prename descclassname">BaseFaultTolerance.</code><code class="sig-name descname">SyndromeCorrector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">correctorCircuit</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeCorrector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeCorrector" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class for implementing fault tolerant syndrome correction for an arbitrary error correction scheme.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -490,7 +620,7 @@ The outputs of the map are tuples of the form <code class="docutils literal notr
 </dd>
 </dl>
 <p class="rubric">Methods</p>
-<table class="docutils align-default">
+<table class="table">
 <colgroup>
 <col style="width: 35%" />
 <col style="width: 65%" />
@@ -505,8 +635,8 @@ The outputs of the map are tuples of the form <code class="docutils literal notr
 </tbody>
 </table>
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.SyndromeCorrector.syndromeCorrectCircuit">
-<span class="sig-name descname"><span class="pre">syndromeCorrectCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeCorrector.syndromeCorrectCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeCorrector.syndromeCorrectCircuit" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.SyndromeCorrector.syndromeCorrectCircuit">
+<code class="sig-name descname">syndromeCorrectCircuit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">circuit</span></em>, <em class="sig-param"><span class="n">qregs</span></em>, <em class="sig-param"><span class="n">cregs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeCorrector.syndromeCorrectCircuit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeCorrector.syndromeCorrectCircuit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates gates implementing fault tolerant syndrome correction for the given qubits in the given circuit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -523,8 +653,8 @@ The outputs of the map are tuples of the form <code class="docutils literal notr
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.SyndromeCorrector.syndromeCorrectDag">
-<span class="sig-name descname"><span class="pre">syndromeCorrectDag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeCorrector.syndromeCorrectDag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeCorrector.syndromeCorrectDag" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.SyndromeCorrector.syndromeCorrectDag">
+<code class="sig-name descname">syndromeCorrectDag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dag</span></em>, <em class="sig-param"><span class="n">qregs</span></em>, <em class="sig-param"><span class="n">cregs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeCorrector.syndromeCorrectDag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeCorrector.syndromeCorrectDag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates gates implementing fault tolerant syndrome correction for the given qubits in the given DAG.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -543,8 +673,8 @@ The outputs of the map are tuples of the form <code class="docutils literal notr
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="BaseFaultTolerance.SyndromeDetector">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">BaseFaultTolerance.</span></span><span class="sig-name descname"><span class="pre">SyndromeDetector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detectorCircuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numAncillas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeDetector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeDetector" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.SyndromeDetector">
+<em class="property">class </em><code class="sig-prename descclassname">BaseFaultTolerance.</code><code class="sig-name descname">SyndromeDetector</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">detectorCircuit</span></em>, <em class="sig-param"><span class="n">numAncillas</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeDetector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeDetector" title="Permalink to this definition">¶</a></dt>
 <dd><p>A class for implementing non-fault tolerant syndrome detection for an arbitrary error correction scheme.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -557,7 +687,7 @@ The outputs of the map are tuples of the form <code class="docutils literal notr
 </dd>
 </dl>
 <p class="rubric">Methods</p>
-<table class="docutils align-default">
+<table class="table">
 <colgroup>
 <col style="width: 34%" />
 <col style="width: 66%" />
@@ -572,8 +702,8 @@ The outputs of the map are tuples of the form <code class="docutils literal notr
 </tbody>
 </table>
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.SyndromeDetector.syndromeDetectCircuit">
-<span class="sig-name descname"><span class="pre">syndromeDetectCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeDetector.syndromeDetectCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeDetector.syndromeDetectCircuit" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.SyndromeDetector.syndromeDetectCircuit">
+<code class="sig-name descname">syndromeDetectCircuit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">circuit</span></em>, <em class="sig-param"><span class="n">qregs</span></em>, <em class="sig-param"><span class="n">cregs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ancillas</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeDetector.syndromeDetectCircuit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeDetector.syndromeDetectCircuit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates gates implementing non-fault tolerant syndrome detection for the given qubits in the given circuit.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -592,8 +722,8 @@ The outputs of the map are tuples of the form <code class="docutils literal notr
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="BaseFaultTolerance.SyndromeDetector.syndromeDetectDag">
-<span class="sig-name descname"><span class="pre">syndromeDetectDag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qregs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cregs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ancillas</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeDetector.syndromeDetectDag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeDetector.syndromeDetectDag" title="Permalink to this definition">¶</a></dt>
+<dt id="BaseFaultTolerance.SyndromeDetector.syndromeDetectDag">
+<code class="sig-name descname">syndromeDetectDag</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dag</span></em>, <em class="sig-param"><span class="n">qregs</span></em>, <em class="sig-param"><span class="n">cregs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ancillas</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/BaseFaultTolerance.html#SyndromeDetector.syndromeDetectDag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#BaseFaultTolerance.SyndromeDetector.syndromeDetectDag" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates gates implementing non-fault tolerant syndrome detection for the given qubits in the given DAG.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -613,65 +743,43 @@ The outputs of the map are tuples of the form <code class="docutils literal notr
 
 </dd></dl>
 
-</section>
-
-
-            <div class="clearer"></div>
-          </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="API.html"
-                        title="previous chapter">QiskiFT API</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="Steane.html"
-                        title="next chapter">The Steane Module</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/Base.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
-    </div>
 </div>
-<script>$('#searchbox').show(0);</script>
-        </div>
+
+
+              </div>
+              
+              
+              <div class='prev-next-bottom'>
+                
+    <a class='left-prev' id="prev-link" href="API.html" title="previous page">QiskiFT API</a>
+    <a class='right-next' id="next-link" href="Steane.html" title="next page">The Steane Module</a>
+
+              </div>
+              
+          </main>
+          
+
       </div>
-      <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="Steane.html" title="The Steane Module"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="API.html" title="QiskiFT API"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">QiskiFT 1.0.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="API.html" >QiskiFT API</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">The BaseFaultTolerance Module</a></li> 
-      </ul>
+  
+  <script src="_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2021, Owen Dugan.<br/>
+</p>
     </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2021, Owen Dugan.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.0.
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.1.2.<br/>
+</p>
     </div>
+    
+  </div>
+</footer>
   </body>
 </html>
