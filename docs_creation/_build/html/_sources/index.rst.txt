@@ -5,7 +5,9 @@
 
 Welcome to QiskiFT!
 ===================================
-QiskiFT is a package for implementing Quantum Error Correction and Quantum Fault Tolerance in Python using Qiskit. It automates much of the process of implementing fault tolerant computation, allowing users to create fault-tolerant circuits in only a few more lines of code than non-fault-tolerant circuits. For example, Deutsch's Algorithm can be implemented fault-tolerantly in 15 lines of code.
+`QiskiFT <https://github.com/druidowm/qiskift>`_ is a package for implementing Quantum Error Correction and Quantum Fault Tolerance in Python using `Qiskit <https://qiskit.org/>`_. It automates much of the process of implementing fault tolerant computation, allowing users to create fault-tolerant circuits in only a few more lines of code than non-fault-tolerant circuits. For example, Deutsch's Algorithm can be implemented fault-tolerantly in 15 lines of code.
+
+This documentation is also available as a :download:`pdf <../docs_creation/_build/latex/qiskift.pdf>`.
 
 .. list-table::
 
