@@ -184,7 +184,7 @@ class SteaneSyndromeCorrector(SyndromeCorrector):
         qreg = QuantumRegister(size = 7)
         creg = ClassicalRegister(size = 6)
 
-        correctorCircuit = QuantumCircuit(qreg,creg)
+        correctorCircuit = QuantumCircuit(qreg,creg,name="Steane Syndrome Correction")
 
         correctorCircuit.x(qreg[0]).c_if(creg,32)
         correctorCircuit.x(qreg[1]).c_if(creg,16)
