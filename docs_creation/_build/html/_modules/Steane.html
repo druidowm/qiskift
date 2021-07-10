@@ -1,0 +1,391 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Steane &#8212; QiskiFT 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">QiskiFT 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Steane</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for Steane</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The Steane Module implements Quantum Error Correction and Quantum Fault Tolerance using the Steane 7-qubit code. </span>
+<span class="sd">The 7-qubit code encodes the state :math:`|\\phi\\rangle` as </span>
+<span class="sd">$$|\\tilde{\\phi}\\rangle = (1+X_0X_4X_5X_6)(1+X_1X_3X_5X_6)(1+X_2X_3X_4X_6)|\\phi\\rangle.$$</span>
+<span class="sd">For Syndrome Detection, the Steane code measures 6 operators:</span>
+<span class="sd">$$M_a = X_0X_4X_5X_6,$$</span>
+<span class="sd">$$M_b = X_1X_3X_5X_6,$$</span>
+<span class="sd">$$M_c = X_2X_3X_4X_6,$$</span>
+<span class="sd">$$N_a = Z_0Z_4Z_5Z_6,$$</span>
+<span class="sd">$$N_b = Z_1Z_3Z_5Z_6,$$</span>
+<span class="sd">and</span>
+<span class="sd">$$N_c = Z_2Z_3Z_4Z_6.$$</span>
+<span class="sd">More details about each aspect of the Steane code are provided below.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">BaseFaultTolerance</span> <span class="kn">import</span> <span class="n">Encoder</span><span class="p">,</span><span class="n">FaultTolerantEncoder</span><span class="p">,</span><span class="n">SyndromeDetector</span><span class="p">,</span><span class="n">SyndromeCorrector</span><span class="p">,</span><span class="n">ErrorCorrector</span><span class="p">,</span><span class="n">FaultTolerantGates</span>
+<span class="kn">from</span> <span class="nn">qiskit.circuit</span> <span class="kn">import</span> <span class="n">QuantumCircuit</span><span class="p">,</span><span class="n">QuantumRegister</span><span class="p">,</span><span class="n">AncillaRegister</span><span class="p">,</span><span class="n">ClassicalRegister</span><span class="p">,</span><span class="n">Qubit</span>
+<span class="kn">from</span> <span class="nn">qiskit.converters</span> <span class="kn">import</span> <span class="n">circuit_to_dag</span><span class="p">,</span> <span class="n">dag_to_circuit</span>
+<span class="kn">from</span> <span class="nn">qiskit.circuit.library</span> <span class="kn">import</span> <span class="n">CXGate</span><span class="p">,</span><span class="n">HGate</span><span class="p">,</span><span class="n">XGate</span><span class="p">,</span><span class="n">SGate</span>
+
+<div class="viewcode-block" id="SteaneEncoder"><a class="viewcode-back" href="../Steane.html#Steane.SteaneEncoder">[docs]</a><span class="k">class</span> <span class="nc">SteaneEncoder</span><span class="p">(</span><span class="n">Encoder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for implementing non-fault tolerant preparation of the Steane $|0\\rangle$ state.</span>
+<span class="sd">    As described at the top of this page, the $|0\\rangle$ state is encoded as </span>
+<span class="sd">    $$|\\tilde{0}\\rangle = (1+X_0X_4X_5X_6)(1+X_1X_3X_5X_6)(1+X_2X_3X_4X_6)|0\\rangle.$$</span>
+<span class="sd">    The circuit representation of the initialization process is:</span>
+<span class="sd">    </span>
+<span class="sd">    .. figure:: Images/SteaneEncoding.png</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    createEncoderCircuit :</span>
+<span class="sd">        Creates a circuit encoding the :math:`|0\\rangle` state</span>
+<span class="sd">    createEncoderDag :</span>
+<span class="sd">        Creates a DAG encoding the :math:`|0\\rangle` state</span>
+<span class="sd">    getEncoderCircuit :</span>
+<span class="sd">        Adds gates encoding the :math:`|0\\rangle` state to a circuit</span>
+<span class="sd">    getEncoderDag :</span>
+<span class="sd">        Adds gates encoding the :math:`|0\\rangle` state to a DAG</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">qregister</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="n">encoder</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">qregister</span><span class="p">,</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Steane Encoder&quot;</span><span class="p">)</span>
+
+        <span class="n">encoder</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="n">qregister</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+
+        <span class="n">encoder</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">qregister</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">qregister</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">encoder</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">qregister</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">qregister</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">encoder</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">qregister</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">qregister</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+        <span class="n">encoder</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">qregister</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">qregister</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">encoder</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">qregister</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">qregister</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+        <span class="n">encoder</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">qregister</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">qregister</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+        <span class="n">encoder</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">qregister</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">qregister</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">encoder</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">qregister</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">qregister</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+        <span class="n">encoder</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">qregister</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">qregister</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+
+        <span class="n">qregister</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="n">encoderCircuit</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">qregister</span><span class="p">)</span>
+        <span class="n">encoderCircuit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">to_gate</span><span class="p">(),</span><span class="n">qargs</span> <span class="o">=</span> <span class="n">qregister</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">encoderCircuit</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SteaneFaultTolerantEncoder"><a class="viewcode-back" href="../Steane.html#Steane.SteaneFaultTolerantEncoder">[docs]</a><span class="k">class</span> <span class="nc">SteaneFaultTolerantEncoder</span><span class="p">(</span><span class="n">FaultTolerantEncoder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for implementing fault tolerant ecoding of the Steane encoded $|0\\rangle$ state.</span>
+<span class="sd">    NOT FINISHED.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    numRepeats : int</span>
+<span class="sd">        The number of times to try to create the $|0\\rangle$ state before giving up.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    createEncoderCircuit :</span>
+<span class="sd">        Creates a circuit encoding the :math:`|0\\rangle` state</span>
+<span class="sd">    createEncoderDag :</span>
+<span class="sd">        Creates a DAG encoding the :math:`|0\\rangle` state</span>
+<span class="sd">    getEncoderCircuit :</span>
+<span class="sd">        Adds gates encoding the :math:`|0\\rangle` state to a circuit</span>
+<span class="sd">    getEncoderDag :</span>
+<span class="sd">        Adds gates encoding the :math:`|0\\rangle` state to a DAG</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numRepeats</span><span class="p">):</span>
+        <span class="n">qreg</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+        <span class="n">areg</span> <span class="o">=</span> <span class="n">AncillaRegister</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">c</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">qreg</span><span class="p">,</span><span class="n">areg</span><span class="p">,</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Checker&quot;</span><span class="p">)</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="n">areg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="n">areg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span><span class="n">areg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">qreg</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+        <span class="n">areg</span> <span class="o">=</span> <span class="n">AncillaRegister</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">creg</span> <span class="o">=</span> <span class="n">ClassicalRegister</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">checker</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">qreg</span><span class="p">,</span><span class="n">areg</span><span class="p">,</span><span class="n">creg</span><span class="p">)</span>
+        <span class="n">checker</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">to_gate</span><span class="p">(),</span><span class="n">qargs</span><span class="o">=</span><span class="p">[</span><span class="n">qbit</span> <span class="k">for</span> <span class="n">qbit</span> <span class="ow">in</span> <span class="n">qreg</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="n">areg</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="n">checker</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="n">areg</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">creg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">SteaneEncoder</span><span class="p">(),</span><span class="n">checker</span><span class="p">,</span><span class="mi">1</span><span class="p">,[</span><span class="mi">0</span><span class="p">],</span><span class="n">numRepeats</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SteaneSyndromeDetector"><a class="viewcode-back" href="../Steane.html#Steane.SteaneSyndromeDetector">[docs]</a><span class="k">class</span> <span class="nc">SteaneSyndromeDetector</span><span class="p">(</span><span class="n">SyndromeDetector</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for implementing non-fault tolerant syndrome detection for the Steane Code.</span>
+<span class="sd">    Syndrome detection works by measuring six stabilizer operators, $M_a,$ $M_b,$ $M_c,$ $N_a,$ $N_b,$ and $N_c,$ defined at the top of this page.</span>
+<span class="sd">    The circuit representation of the syndrome detection process is:</span>
+
+<span class="sd">    .. figure:: Images/SteaneSyndromeDetection.png</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    syndromeDetectCircuit :</span>
+<span class="sd">        Implements syndrome detection for the given circuit.</span>
+<span class="sd">    syndromeDetectDag :</span>
+<span class="sd">        Implements syndrome detection for the given DAG.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">qreg</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="n">ancilla</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="mi">6</span><span class="p">)</span>
+        <span class="n">creg</span> <span class="o">=</span> <span class="n">ClassicalRegister</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="mi">6</span><span class="p">)</span>
+
+        <span class="n">detectorCircuit</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">qreg</span><span class="p">,</span><span class="n">ancilla</span><span class="p">,</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Steane Syndrome Detection&quot;</span><span class="p">)</span>
+
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="n">ancilla</span><span class="p">)</span>
+
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cz</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cz</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cz</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cz</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cz</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cz</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cz</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cz</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cz</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cz</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cz</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cz</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+
+
+
+
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">ancilla</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">qreg</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+
+        <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="n">ancilla</span><span class="p">)</span>
+        
+        <span class="n">measureCircuit</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">qreg</span><span class="p">,</span><span class="n">ancilla</span><span class="p">,</span><span class="n">creg</span><span class="p">)</span>
+        <span class="n">measureCircuit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">detectorCircuit</span><span class="o">.</span><span class="n">to_gate</span><span class="p">(),[</span><span class="n">qbit</span> <span class="k">for</span> <span class="n">qbit</span> <span class="ow">in</span> <span class="n">qreg</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ancilla</span><span class="p">])</span>
+        <span class="n">measureCircuit</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="n">ancilla</span><span class="p">,</span><span class="n">creg</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">measureCircuit</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SteaneSyndromeCorrector"><a class="viewcode-back" href="../Steane.html#Steane.SteaneSyndromeCorrector">[docs]</a><span class="k">class</span> <span class="nc">SteaneSyndromeCorrector</span><span class="p">(</span><span class="n">SyndromeCorrector</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for implementing fault tolerant syndrome correction for the Steane code.</span>
+<span class="sd">    The circuit representation for Syndrome Correction is shown below:</span>
+
+<span class="sd">    .. figure:: Images/SteaneSyndromeCorrection.png</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    syndromeCorrectCircuit :</span>
+<span class="sd">        Implements syndrome correction for the given circuit.</span>
+<span class="sd">    syndromeCorrectDag :</span>
+<span class="sd">        Implements syndrome correction for the given DAG.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">qreg</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="n">creg</span> <span class="o">=</span> <span class="n">ClassicalRegister</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="mi">6</span><span class="p">)</span>
+
+        <span class="n">correctorCircuit</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">qreg</span><span class="p">,</span><span class="n">creg</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Steane Syndrome Correction&quot;</span><span class="p">)</span>
+
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">32</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">16</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">24</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">40</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">48</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">56</span><span class="p">)</span>
+
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">7</span><span class="p">)</span>
+
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">36</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">18</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">9</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">27</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">45</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">54</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">63</span><span class="p">)</span>
+        
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">36</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">18</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">9</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">27</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">45</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">54</span><span class="p">)</span>
+        <span class="n">correctorCircuit</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">qreg</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">creg</span><span class="p">,</span><span class="mi">63</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">correctorCircuit</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SteaneErrorCorrector"><a class="viewcode-back" href="../Steane.html#Steane.SteaneErrorCorrector">[docs]</a><span class="k">class</span> <span class="nc">SteaneErrorCorrector</span><span class="p">(</span><span class="n">ErrorCorrector</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for implementing non-fault tolerant error correction for the Steane Code.</span>
+<span class="sd">    This class combines :class:`SteaneSyndromeDetection` and :class:`SteaneSyndromeCorrection` into a single class for ease of use.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    errorCorrectCircuit :</span>
+<span class="sd">        Implements error correction for the given circuit.</span>
+<span class="sd">    errorCorrecDag :</span>
+<span class="sd">        Implements error correction for the given DAG.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">SteaneSyndromeDetector</span><span class="p">(),</span><span class="n">SteaneSyndromeCorrector</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="SteaneFaultTolerantGates"><a class="viewcode-back" href="../Steane.html#Steane.SteaneFaultTolerantGates">[docs]</a><span class="k">class</span> <span class="nc">SteaneFaultTolerantGates</span><span class="p">(</span><span class="n">FaultTolerantGates</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for implementing fault tolerant gates for the Steane Code.</span>
+<span class="sd">    The current implemented gates are $X,$ $H,$ $S,$ and CNOT. These gates can all be implemented bitwise.</span>
+<span class="sd">    The figures below show the implementations for these four gates.</span>
+<span class="sd">    </span>
+<span class="sd">    .. list-table::</span>
+
+<span class="sd">       * - .. figure:: Images/SteaneX.png</span>
+<span class="sd">              :height: 300</span>
+
+<span class="sd">              The fault tolerant X gate.</span>
+<span class="sd">         - .. figure:: Images/SteaneH.png</span>
+<span class="sd">              :height: 300</span>
+
+<span class="sd">              The fault tolerant H gate.</span>
+<span class="sd">         - .. figure:: Images/SteaneS.png</span>
+<span class="sd">              :height: 300</span>
+
+<span class="sd">              The fault tolerant S gate.</span>
+<span class="sd">         - .. figure:: Images/SteaneCNOT.png</span>
+<span class="sd">              :height: 300</span>
+
+<span class="sd">              The fault tolerant CNOT gate.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    addGateCircuit :</span>
+<span class="sd">        Adds a fault tolerant gate to the given circuit.</span>
+<span class="sd">    addGateDag :</span>
+<span class="sd">        Adds a fault tolerant gate to the given DAG.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cnotGateQ1</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+        <span class="n">cnotGateQ2</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+        <span class="n">cnotGate</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">cnotGateQ1</span><span class="p">,</span><span class="n">cnotGateQ2</span><span class="p">,</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;CNOT&quot;</span><span class="p">)</span>
+        <span class="n">cnotGate</span><span class="o">.</span><span class="n">cx</span><span class="p">(</span><span class="n">cnotGateQ1</span><span class="p">,</span><span class="n">cnotGateQ2</span><span class="p">)</span>
+
+        <span class="n">cnotQ1</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+        <span class="n">cnotQ2</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+        <span class="n">cnot</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">cnotQ1</span><span class="p">,</span><span class="n">cnotQ2</span><span class="p">)</span>
+        <span class="n">cnot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cnotGate</span><span class="o">.</span><span class="n">to_gate</span><span class="p">(),</span> <span class="n">qargs</span> <span class="o">=</span> <span class="p">[</span><span class="n">qbit</span> <span class="k">for</span> <span class="n">qbit</span> <span class="ow">in</span> <span class="n">cnotQ1</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="n">qbit</span> <span class="k">for</span> <span class="n">qbit</span> <span class="ow">in</span> <span class="n">cnotQ2</span><span class="p">])</span>
+
+
+        <span class="n">hGateQ</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+        <span class="n">hGate</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">hGateQ</span><span class="p">,</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;H&quot;</span><span class="p">)</span>
+        <span class="n">hGate</span><span class="o">.</span><span class="n">h</span><span class="p">(</span><span class="n">hGateQ</span><span class="p">)</span>
+        <span class="n">hQ</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">hQ</span><span class="p">)</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hGate</span><span class="p">,</span> <span class="n">qargs</span> <span class="o">=</span> <span class="n">hQ</span><span class="p">)</span>
+
+        <span class="n">xGateQ</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+        <span class="n">xGate</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">xGateQ</span><span class="p">,</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;X&quot;</span><span class="p">)</span>
+        <span class="n">xGate</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">xGateQ</span><span class="p">)</span>
+        <span class="n">xQ</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">xQ</span><span class="p">)</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xGate</span><span class="p">,</span> <span class="n">qargs</span> <span class="o">=</span> <span class="n">xQ</span><span class="p">)</span>
+
+        <span class="n">sGateQ</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+        <span class="n">sGate</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">sGateQ</span><span class="p">,</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;S&quot;</span><span class="p">)</span>
+        <span class="n">sGate</span><span class="o">.</span><span class="n">s</span><span class="p">(</span><span class="n">sGateQ</span><span class="p">)</span>
+        <span class="n">sGate</span><span class="o">.</span><span class="n">z</span><span class="p">(</span><span class="n">sGateQ</span><span class="p">)</span>
+        <span class="n">sQ</span> <span class="o">=</span> <span class="n">QuantumRegister</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">(</span><span class="n">sQ</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sGate</span><span class="p">,</span> <span class="n">qargs</span> <span class="o">=</span> <span class="n">sQ</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">({</span><span class="n">CXGate</span><span class="p">()</span><span class="o">.</span><span class="n">qasm</span><span class="p">():</span> <span class="p">(</span><span class="n">cnot</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">HGate</span><span class="p">()</span><span class="o">.</span><span class="n">qasm</span><span class="p">():</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">XGate</span><span class="p">()</span><span class="o">.</span><span class="n">qasm</span><span class="p">():</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">SGate</span><span class="p">()</span><span class="o">.</span><span class="n">qasm</span><span class="p">():</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="mi">0</span><span class="p">)})</span></div>
+
+
+
+
+        
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">QiskiFT 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Steane</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Owen Dugan.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,900 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BaseFaultTolerance &#8212; QiskiFT 1.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinxdoc.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">QiskiFT 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">BaseFaultTolerance</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for BaseFaultTolerance</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The BaseFaultTolerance module contains base classes for Quantum Error Correction and Quantum Fault Tolerance. </span>
+<span class="sd">These classes are generic; they require the user to provide the relevant algorithms when they are initialized.</span>
+<span class="sd">For specific quantum codes, see the Codes page. Note that only the Steane code is currently implemented.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">qiskit.transpiler.basepasses</span> <span class="kn">import</span> <span class="n">TransformationPass</span>
+<span class="kn">from</span> <span class="nn">qiskit.transpiler.passes.basis.unroller</span> <span class="kn">import</span> <span class="n">Unroller</span>
+<span class="kn">from</span> <span class="nn">qiskit.dagcircuit</span> <span class="kn">import</span> <span class="n">DAGCircuit</span>
+<span class="kn">from</span> <span class="nn">qiskit.circuit</span> <span class="kn">import</span> <span class="n">QuantumCircuit</span><span class="p">,</span><span class="n">QuantumRegister</span><span class="p">,</span><span class="n">ClassicalRegister</span><span class="p">,</span><span class="n">AncillaRegister</span><span class="p">,</span><span class="n">Qubit</span><span class="p">,</span><span class="n">Reset</span>
+<span class="kn">from</span> <span class="nn">qiskit.converters</span> <span class="kn">import</span> <span class="n">circuit_to_dag</span><span class="p">,</span> <span class="n">dag_to_circuit</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+<span class="k">def</span> <span class="nf">_checkNameCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">register</span> <span class="ow">in</span> <span class="n">circuit</span><span class="o">.</span><span class="n">qregs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">register</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">register</span> <span class="ow">in</span> <span class="n">circuit</span><span class="o">.</span><span class="n">cregs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">register</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+<span class="k">def</span> <span class="nf">_checkNameDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">register</span> <span class="ow">in</span> <span class="n">dag</span><span class="o">.</span><span class="n">qregs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dag</span><span class="o">.</span><span class="n">qregs</span><span class="p">[</span><span class="n">register</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">register</span> <span class="ow">in</span> <span class="n">dag</span><span class="o">.</span><span class="n">cregs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dag</span><span class="o">.</span><span class="n">cregs</span><span class="p">[</span><span class="n">register</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+<span class="k">def</span> <span class="nf">_makeQregsCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">numRegs</span><span class="p">,</span> <span class="n">numBits</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;q&quot;</span><span class="p">):</span>
+    <span class="n">qregs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">n</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numRegs</span><span class="p">):</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">_checkNameCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span><span class="n">name</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">)):</span>
+            <span class="n">n</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="n">qregs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">QuantumRegister</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">numBits</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">)))</span>
+        <span class="n">circuit</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="n">qregs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">qregs</span>
+
+<span class="k">def</span> <span class="nf">_makeQregsDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">numRegs</span><span class="p">,</span> <span class="n">numBits</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;q&quot;</span><span class="p">):</span>
+    <span class="n">qregs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">n</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numRegs</span><span class="p">):</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">_checkNameDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span><span class="n">name</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">)):</span>
+            <span class="n">n</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="n">qregs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">QuantumRegister</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">numBits</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">)))</span>
+        <span class="n">dag</span><span class="o">.</span><span class="n">add_qreg</span><span class="p">(</span><span class="n">qregs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">qregs</span>
+
+<span class="k">def</span> <span class="nf">_makeAncillasCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">numRegs</span><span class="p">,</span> <span class="n">numBits</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ancilla&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">numBits</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numRegs</span><span class="p">)]</span>
+    <span class="n">ancillas</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">n</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numRegs</span><span class="p">):</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">_checkNameCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span><span class="n">name</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">)):</span>
+            <span class="n">n</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="n">ancillas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AncillaRegister</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">numBits</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">)))</span>
+        <span class="n">circuit</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="n">ancillas</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">ancillas</span>
+
+<span class="k">def</span> <span class="nf">_makeAncillasDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">numRegs</span><span class="p">,</span> <span class="n">numBits</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ancilla&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">numBits</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numRegs</span><span class="p">)]</span>
+    <span class="n">ancillas</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">n</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numRegs</span><span class="p">):</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">_checkNameDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span><span class="n">name</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">)):</span>
+            <span class="n">n</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="n">ancillas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AncillaRegister</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">numBits</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">)))</span>
+        <span class="n">dag</span><span class="o">.</span><span class="n">add_qreg</span><span class="p">(</span><span class="n">ancillas</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">ancillas</span>
+
+<span class="k">def</span> <span class="nf">_makeCregsCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">numRegs</span><span class="p">,</span> <span class="n">numBits</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;measure&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">numBits</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numRegs</span><span class="p">)]</span>
+    <span class="n">cregs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">n</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numRegs</span><span class="p">):</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">_checkNameCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span><span class="n">name</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">)):</span>
+            <span class="n">n</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="n">cregs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ClassicalRegister</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">numBits</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">)))</span>
+        <span class="n">circuit</span><span class="o">.</span><span class="n">add_register</span><span class="p">(</span><span class="n">cregs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">cregs</span>
+
+<span class="k">def</span> <span class="nf">_makeCregsDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">numRegs</span><span class="p">,</span> <span class="n">numBits</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;measure&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">numBits</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numRegs</span><span class="p">)]</span>
+    <span class="n">cregs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">n</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numRegs</span><span class="p">):</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">_checkNameDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span><span class="n">name</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">)):</span>
+            <span class="n">n</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="n">cregs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ClassicalRegister</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">numBits</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="n">n</span><span class="p">)))</span>
+        <span class="n">dag</span><span class="o">.</span><span class="n">add_creg</span><span class="p">(</span><span class="n">cregs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">cregs</span>
+
+<span class="k">def</span> <span class="nf">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas</span><span class="p">,</span><span class="n">singleQbit</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">singleQbit</span><span class="p">:</span>
+        <span class="n">qbits</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">)):</span>
+            <span class="n">qbits</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">qbit</span> <span class="k">for</span> <span class="n">qbit</span> <span class="ow">in</span> <span class="n">qregs</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">+</span><span class="p">[</span><span class="n">ancilla</span> <span class="k">for</span> <span class="n">ancilla</span> <span class="ow">in</span> <span class="n">ancillas</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="n">qbits</span>
+
+    <span class="n">qbits</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+        <span class="n">qbitList</span> <span class="o">=</span> <span class="p">[</span><span class="n">ancilla</span> <span class="k">for</span> <span class="n">ancilla</span> <span class="ow">in</span> <span class="n">ancillas</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">)):</span>
+            <span class="n">qbitList</span> <span class="o">+=</span> <span class="p">[</span><span class="n">qbit</span> <span class="k">for</span> <span class="n">qbit</span> <span class="ow">in</span> <span class="n">qregs</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]]</span>
+        <span class="n">qbits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">qbitList</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">qbits</span>
+
+
+<div class="viewcode-block" id="FaultTolerance"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.FaultTolerance">[docs]</a><span class="k">class</span> <span class="nc">FaultTolerance</span><span class="p">(</span><span class="n">TransformationPass</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A Transpiler pass that converts a given quantum computation into an equivalent one with error correction. NOT YET IMPLEMENTED</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">syndromeDetector</span><span class="p">,</span> <span class="n">gates</span><span class="p">,</span> <span class="n">measurement</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span> <span class="o">=</span> <span class="n">encoder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_syndromeDetector</span> <span class="o">=</span> <span class="n">syndromeDetector</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gates</span> <span class="o">=</span> <span class="n">gates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurement</span> <span class="o">=</span> <span class="n">measurement</span>
+
+<div class="viewcode-block" id="FaultTolerance.run"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.FaultTolerance.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">dag</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_syndromeDetector</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gates</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_measurement</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">dag</span> <span class="o">=</span> <span class="n">Unroller</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gates</span><span class="o">.</span><span class="n">gates</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dag</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Encoder"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.Encoder">[docs]</a><span class="k">class</span> <span class="nc">Encoder</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for implementing the non-fault tolerant ecoding of the Steane :math:`|0\\rangle` state.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    createEncoderCircuit :</span>
+<span class="sd">        Creates a circuit encoding the :math:`|0\\rangle` state</span>
+<span class="sd">    createEncoderDag :</span>
+<span class="sd">        Creates a DAG encoding the :math:`|0\\rangle` state</span>
+<span class="sd">    getEncoderCircuit :</span>
+<span class="sd">        Adds gates encoding the :math:`|0\\rangle` state to a circuit</span>
+<span class="sd">    getEncoderDag :</span>
+<span class="sd">        Adds gates encoding the :math:`|0\\rangle` state to a DAG</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoderCircuit</span><span class="p">,</span> <span class="n">numAncillas</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoderCircuit</span> <span class="o">=</span> <span class="n">encoderCircuit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoderDag</span> <span class="o">=</span> <span class="n">circuit_to_dag</span><span class="p">(</span><span class="n">encoderCircuit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span> <span class="o">=</span> <span class="n">numAncillas</span>
+
+<div class="viewcode-block" id="Encoder.createEncoderCircuit"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.Encoder.createEncoderCircuit">[docs]</a>    <span class="k">def</span> <span class="nf">createEncoderCircuit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a circuit encoding the specified number of qubits to the encoded :math:`|0\\rangle` state.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        numQubits : int</span>
+<span class="sd">            The number of qubits to initialize to the encoded :math:`|0\\rangle` state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoderCircuit</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">circuit</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">()</span>
+
+        <span class="n">qregs</span> <span class="o">=</span> <span class="n">_makeQregsCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span><span class="n">numQubits</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoderCircuit</span><span class="o">.</span><span class="n">num_qubits</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+        <span class="n">ancillas</span> <span class="o">=</span> <span class="n">_makeAncillasCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+        <span class="n">cregs</span> <span class="o">=</span> <span class="n">_makeCregsCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoderCircuit</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">)</span>
+        <span class="n">qbits</span> <span class="o">=</span> <span class="n">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numQubits</span><span class="p">):</span>
+            <span class="n">circuit</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoderCircuit</span><span class="p">,</span> <span class="n">qbits</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cregs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">circuit</span></div>
+
+<div class="viewcode-block" id="Encoder.createEncoderDag"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.Encoder.createEncoderDag">[docs]</a>    <span class="k">def</span> <span class="nf">createEncoderDag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a DAG encoding the specified number of qubits to the encoded :math:`|0\\rangle` state.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        numQubits : int</span>
+<span class="sd">            The number of qubits to initialize to the encoded :math:`|0\\rangle` state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoderCircuit</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">dag</span> <span class="o">=</span> <span class="n">DAGCircuit</span><span class="p">()</span>
+
+        <span class="n">qregs</span> <span class="o">=</span> <span class="n">_makeQregsDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span><span class="n">numQubits</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoderDag</span><span class="o">.</span><span class="n">num_qubits</span><span class="p">()</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+        <span class="n">ancillas</span> <span class="o">=</span> <span class="n">_makeAncillasDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+        <span class="n">cregs</span> <span class="o">=</span> <span class="n">_makeCregsDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoderDag</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">())</span>
+        <span class="n">qbits</span> <span class="o">=</span> <span class="n">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numQubits</span><span class="p">):</span>
+            <span class="n">dag</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoderDag</span><span class="p">,</span> <span class="n">qubits</span> <span class="o">=</span> <span class="n">qbits</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">clbits</span> <span class="o">=</span> <span class="n">cregs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">dag</span></div>
+
+<div class="viewcode-block" id="Encoder.getEncoderCircuit"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.Encoder.getEncoderCircuit">[docs]</a>    <span class="k">def</span> <span class="nf">getEncoderCircuit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">circuit</span><span class="p">,</span> <span class="n">qregs</span><span class="p">,</span> <span class="n">cregs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ancillas</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Encodes the specified Quantum Registers to the encoded :math:`|0\\rangle` state for the given circuit.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dag : DAGCircuit</span>
+<span class="sd">            The circuit for which to create the encoding.</span>
+<span class="sd">        qregs : list(QuantumRegister)</span>
+<span class="sd">            The Quantum Registers to encode to the :math:`|0\\rangle`.</span>
+<span class="sd">        cregs : list(ClassicalRegister), Optional</span>
+<span class="sd">            The Classical Registers used to encode to the :math:`|0\\rangle`, if classical registers are needed. If ``cregs`` is provided, it must satisfy ``len(cregs) == len(qregs)`` and the encoding process for the ``qregs[i]`` quantum register will use the ``cregs[i]`` classical register.</span>
+<span class="sd">        ancillas : list(AncillaRegister), list(QuantumRegister), Optional</span>
+<span class="sd">            The Ancilla Registers used to encode to the :math:`|0\\rangle`, if ancilla registers are needed. If ``ancillas`` is provided, it must satisfy ``len(ancillas) == len(cregs) == len(qregs)`` and the encoding process for the ``qregs[i]`` quantum register will use the ``ancillas[i]`` ancilla register.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoderCircuit</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">ancillas</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ancillas</span> <span class="o">=</span> <span class="n">_makeAncillasCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">cregs</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cregs</span> <span class="o">=</span> <span class="n">_makeCregsCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoderCircuit</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">)</span>
+        
+        <span class="n">qbits</span> <span class="o">=</span> <span class="n">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">)):</span>
+            <span class="n">circuit</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoderCircuit</span><span class="p">,</span> <span class="n">qbits</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cregs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">circuit</span></div>
+
+<div class="viewcode-block" id="Encoder.getEncoderDag"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.Encoder.getEncoderDag">[docs]</a>    <span class="k">def</span> <span class="nf">getEncoderDag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dag</span><span class="p">,</span> <span class="n">qregs</span><span class="p">,</span> <span class="n">cregs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ancillas</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Encodes the specified Quantum Registers to the encoded :math:`|0\\rangle` state for the given DAG.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dag : DAGCircuit</span>
+<span class="sd">            The circuit for which to create the encoding.</span>
+<span class="sd">        qregs : list(QuantumRegister)</span>
+<span class="sd">            The Quantum Registers to encode to the :math:`|0\\rangle`.</span>
+<span class="sd">        cregs : list(ClassicalRegister), Optional</span>
+<span class="sd">            The Classical Registers used to encode to the :math:`|0\\rangle`, if classical registers are needed. If ``cregs`` is provided, it must satisfy ``len(cregs) == len(qregs)`` and the encoding process for the ``qregs[i]`` quantum register will use the ``cregs[i]`` classical register.</span>
+<span class="sd">        ancillas : list(AncillaRegister), list(QuantumRegister), Optional</span>
+<span class="sd">            The Ancilla Registers used to encode to the :math:`|0\\rangle`, if ancilla registers are needed. If ``ancillas`` is provided, it must satisfy ``len(ancillas) == len(cregs) == len(qregs)`` and the encoding process for the ``qregs[i]`` quantum register will use the ``ancillas[i]`` ancilla register.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoderCircuit</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">ancillas</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ancillas</span> <span class="o">=</span> <span class="n">_makeAncillasDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">cregs</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cregs</span> <span class="o">=</span> <span class="n">_makeCregsDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoderDag</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">())</span>
+        
+        <span class="n">qbits</span> <span class="o">=</span> <span class="n">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">)):</span>
+            <span class="n">dag</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoderDag</span><span class="p">,</span> <span class="n">qubits</span> <span class="o">=</span> <span class="n">qbits</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">clbits</span> <span class="o">=</span> <span class="n">cregs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">dag</span></div></div>
+
+
+<div class="viewcode-block" id="FaultTolerantEncoder"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.FaultTolerantEncoder">[docs]</a><span class="k">class</span> <span class="nc">FaultTolerantEncoder</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for implementing an fault tolerant ecoding of the :math:`|0\\rangle` state for an arbitrary quantum code.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    encoder : Encoder</span>
+<span class="sd">        An Encoder object representing the :math:`|0\\rangle` state non-fault tolerant encoding process. </span>
+<span class="sd">    checkerCircuit : QuantumCircuit</span>
+<span class="sd">        A circuit for determining whether the :math:`|0\\rangle` state has been encoded properly.</span>
+<span class="sd">    numAncillas : int</span>
+<span class="sd">        The number of ancilla qubits used to check the encoded effect. </span>
+<span class="sd">        Note: the ancilla qubits must be at the end of the list of qubits for the circuit.</span>
+<span class="sd">    correctVal : int</span>
+<span class="sd">        The classical register value corresponding to the correct initialization of the encoded :math:`|0\\rangle` state.</span>
+<span class="sd">    numRepeats : int</span>
+<span class="sd">        The number of times to attempt to create the encoded :math:`|0\\rangle` state.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    createEncoderCircuit :</span>
+<span class="sd">        Creates a circuit encoding the :math:`|0\\rangle` state</span>
+<span class="sd">    createEncoderDag :</span>
+<span class="sd">        Creates a DAG encoding the :math:`|0\\rangle` state</span>
+<span class="sd">    getEncoderCircuit :</span>
+<span class="sd">        Adds gates encoding the :math:`|0\\rangle` state to a circuit</span>
+<span class="sd">    getEncoderDag :</span>
+<span class="sd">        Adds gates encoding the :math:`|0\\rangle` state to a DAG</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="n">checkerCircuit</span><span class="p">,</span> <span class="n">numAncillas</span><span class="p">,</span> <span class="n">correctVal</span><span class="p">,</span> <span class="n">numRepeats</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span> <span class="o">=</span> <span class="n">encoder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkerCircuit</span> <span class="o">=</span> <span class="n">checkerCircuit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checkerDag</span> <span class="o">=</span> <span class="n">circuit_to_dag</span><span class="p">(</span><span class="n">checkerCircuit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span> <span class="o">=</span> <span class="n">numAncillas</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_correctVal</span> <span class="o">=</span> <span class="n">correctVal</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numRepeats</span> <span class="o">=</span> <span class="n">numRepeats</span>
+
+<div class="viewcode-block" id="FaultTolerantEncoder.createEncoderCircuit"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.FaultTolerantEncoder.createEncoderCircuit">[docs]</a>    <span class="k">def</span> <span class="nf">createEncoderCircuit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a circuit fault-tolerantly encoding the specified number of qubits to the encoded :math:`|0\\rangle` state.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        numQubits : int</span>
+<span class="sd">            The number of qubits to initialize to the encoded :math:`|0\\rangle` state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">circuit</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">()</span>
+
+        <span class="n">qregs</span> <span class="o">=</span> <span class="n">_makeQregsCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span><span class="n">numQubits</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">_encoderCircuit</span><span class="o">.</span><span class="n">num_qubits</span><span class="p">()</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+        <span class="n">ancillas1</span> <span class="o">=</span> <span class="n">_makeAncillasCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+        <span class="n">cregs1</span> <span class="o">=</span> <span class="n">_makeCregsCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">_encoderCircuit</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">())</span>
+        
+        <span class="n">ancillas2</span> <span class="o">=</span> <span class="n">_makeAncillasCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+        <span class="n">cregs2</span> <span class="o">=</span> <span class="n">_makeCregsCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkerCircuit</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">())</span>
+
+        <span class="n">qbits1</span> <span class="o">=</span> <span class="n">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas1</span><span class="p">)</span>
+        <span class="n">qbits2</span> <span class="o">=</span> <span class="n">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas2</span><span class="p">)</span>
+
+        <span class="n">circuit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">getEncoderCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">qregs</span><span class="p">,</span> <span class="n">cregs1</span><span class="p">,</span> <span class="n">ancillas1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numRepeats</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">)):</span>
+                <span class="n">circuit</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_checkerCircuit</span><span class="p">,</span> <span class="n">qbits2</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">cregs2</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_checkerCircuit</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">()):</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_correctVal</span><span class="p">:</span>
+                        <span class="n">circuit</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">qbits1</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">cregs2</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">k</span><span class="p">)</span>
+                        <span class="n">circuit</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">_encoderCircuit</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">cregs2</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">k</span><span class="p">),</span> <span class="n">qbits1</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">cregs1</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">)):</span>
+            <span class="n">circuit</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_checkerCircuit</span><span class="p">,</span> <span class="n">qbits2</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">cregs2</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">circuit</span></div>
+
+<div class="viewcode-block" id="FaultTolerantEncoder.createEncoderDag"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.FaultTolerantEncoder.createEncoderDag">[docs]</a>    <span class="k">def</span> <span class="nf">createEncoderDag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a DAG fault-tolerantly encoding the specified number of qubits to the encoded :math:`|0\\rangle` state.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        numQubits : int</span>
+<span class="sd">            The number of qubits to initialize to the encoded :math:`|0\\rangle` state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dag</span> <span class="o">=</span> <span class="n">DAGCircuit</span><span class="p">()</span>
+
+        <span class="n">qregs</span> <span class="o">=</span> <span class="n">_makeQregsDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span><span class="n">numQubits</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">_encoderDag</span><span class="o">.</span><span class="n">num_qubits</span><span class="p">()</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+        <span class="n">ancillas1</span> <span class="o">=</span> <span class="n">_makeAncillasDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+        <span class="n">cregs1</span> <span class="o">=</span> <span class="n">_makeCregsDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">_encoderDag</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">())</span>
+
+        <span class="n">ancillas2</span> <span class="o">=</span> <span class="n">_makeAncillasDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+        <span class="n">cregs2</span> <span class="o">=</span> <span class="n">_makeCregsDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkerDag</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">())</span>
+
+        <span class="n">qbits1</span> <span class="o">=</span> <span class="n">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas1</span><span class="p">)</span>
+        <span class="n">qbits2</span> <span class="o">=</span> <span class="n">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas2</span><span class="p">)</span>
+
+        <span class="n">dag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">getEncoderDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">qregs</span><span class="p">,</span> <span class="n">cregs1</span><span class="p">,</span> <span class="n">ancillas1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numRepeats</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">)):</span>
+                <span class="n">dag</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_checkerDag</span><span class="p">,</span> <span class="n">qubits</span> <span class="o">=</span> <span class="n">qbits2</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">clbits</span> <span class="o">=</span> <span class="n">cregs2</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_checkerDag</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">()):</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_correctVal</span><span class="p">:</span>
+                        <span class="n">dag</span><span class="o">.</span><span class="n">apply_operation_back</span><span class="p">(</span><span class="n">Reset</span><span class="p">()</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">cregs2</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">k</span><span class="p">),</span><span class="n">qbits1</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                        <span class="n">dag</span><span class="o">.</span><span class="n">apply_operation_back</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">_encoderCircuit</span><span class="o">.</span><span class="n">to_instruction</span><span class="p">()</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">cregs2</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">k</span><span class="p">),</span> <span class="n">qbits1</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">cregs1</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">)):</span>
+            <span class="n">dag</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_checkerDag</span><span class="p">,</span> <span class="n">qubits</span> <span class="o">=</span> <span class="n">qbits2</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">clbits</span> <span class="o">=</span> <span class="n">cregs2</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">dag</span></div>
+
+<div class="viewcode-block" id="FaultTolerantEncoder.getEncoderCircuit"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.FaultTolerantEncoder.getEncoderCircuit">[docs]</a>    <span class="k">def</span> <span class="nf">getEncoderCircuit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">circuit</span><span class="p">,</span> <span class="n">qregs</span><span class="p">,</span> <span class="n">cregs1</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ancillas1</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cregs2</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ancillas2</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fault-tolerantly encodes the specified Quantum Registers to the encoded :math:`|0\\rangle` state for the given circuit.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dag : DAGCircuit</span>
+<span class="sd">            The circuit for which to create the encoding.</span>
+<span class="sd">        qregs : list(QuantumRegister)</span>
+<span class="sd">            The Quantum Registers to encode to the :math:`|0\\rangle`.</span>
+<span class="sd">        cregs : list(ClassicalRegister), Optional</span>
+<span class="sd">            The Classical Registers used to encode to the :math:`|0\\rangle`, if classical registers are needed. If ``cregs`` is provided, it must satisfy ``len(cregs) == len(qregs)`` and the encoding process for the ``qregs[i]`` quantum register will use the ``cregs[i]`` classical register.</span>
+<span class="sd">        ancillas : list(AncillaRegister), list(QuantumRegister), Optional</span>
+<span class="sd">            The Ancilla Registers used to encode to the :math:`|0\\rangle`, if ancilla registers are needed. If ``ancillas`` is provided, it must satisfy ``len(ancillas) == len(cregs) == len(qregs)`` and the encoding process for the ``qregs[i]`` quantum register will use the ``ancillas[i]`` ancilla register.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">circuit</span> <span class="o">=</span> <span class="n">QuantumCircuit</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">ancillas1</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ancillas1</span> <span class="o">=</span> <span class="n">_makeAncillasCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">cregs1</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cregs1</span> <span class="o">=</span> <span class="n">_makeCregsCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">_encoderCircuit</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">())</span>
+        
+        <span class="k">if</span> <span class="n">ancillas2</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ancillas2</span> <span class="o">=</span> <span class="n">_makeAncillasCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">cregs2</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cregs2</span> <span class="o">=</span> <span class="n">_makeCregsCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkerCircuit</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">())</span>
+
+        <span class="n">qbits1</span> <span class="o">=</span> <span class="n">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas1</span><span class="p">)</span>
+        <span class="n">qbits2</span> <span class="o">=</span> <span class="n">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas2</span><span class="p">)</span>
+
+        <span class="n">circuit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">getEncoderCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span> <span class="n">qregs</span><span class="p">,</span> <span class="n">cregs1</span><span class="p">,</span> <span class="n">ancillas1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numRepeats</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">)):</span>
+                <span class="n">circuit</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_checkerCircuit</span><span class="p">,</span> <span class="n">qbits2</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">cregs2</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_checkerCircuit</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">()):</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_correctVal</span><span class="p">:</span>
+                        <span class="n">circuit</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">qbits1</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">cregs2</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">k</span><span class="p">)</span>
+                        <span class="n">circuit</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">_encoderCircuit</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">cregs2</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">k</span><span class="p">),</span> <span class="n">qbits1</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">cregs1</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">)):</span>
+            <span class="n">circuit</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_checkerCircuit</span><span class="p">,</span> <span class="n">qbits2</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">cregs2</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">circuit</span></div>
+
+<div class="viewcode-block" id="FaultTolerantEncoder.getEncoderDag"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.FaultTolerantEncoder.getEncoderDag">[docs]</a>    <span class="k">def</span> <span class="nf">getEncoderDag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dag</span><span class="p">,</span> <span class="n">qregs</span><span class="p">,</span> <span class="n">cregs1</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ancillas1</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cregs2</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ancillas2</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fault-tolerantly encodes the specified Quantum Registers to the encoded :math:`|0\\rangle` state for the given DAG.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dag : DAGCircuit</span>
+<span class="sd">            The circuit for which to create the encoding.</span>
+<span class="sd">        qregs : list(QuantumRegister)</span>
+<span class="sd">            The Quantum Registers to encode to the :math:`|0\\rangle`.</span>
+<span class="sd">        cregs : list(ClassicalRegister), Optional</span>
+<span class="sd">            The Classical Registers used to encode to the :math:`|0\\rangle`, if classical registers are needed. If ``cregs`` is provided, it must satisfy ``len(cregs) == len(qregs)`` and the encoding process for the ``qregs[i]`` quantum register will use the ``cregs[i]`` classical register.</span>
+<span class="sd">        ancillas : list(AncillaRegister), list(QuantumRegister), Optional</span>
+<span class="sd">            The Ancilla Registers used to encode to the :math:`|0\\rangle`, if ancilla registers are needed. If ``ancillas`` is provided, it must satisfy ``len(ancillas) == len(cregs) == len(qregs)`` and the encoding process for the ``qregs[i]`` quantum register will use the ``ancillas[i]`` ancilla register.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ancillas1</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ancillas1</span> <span class="o">=</span> <span class="n">_makeAncillasDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">cregs1</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cregs1</span> <span class="o">=</span> <span class="n">_makeCregsDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">_encoderDag</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">())</span>
+        
+        <span class="k">if</span> <span class="n">ancillas2</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ancillas2</span> <span class="o">=</span> <span class="n">_makeAncillasDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">cregs2</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cregs2</span> <span class="o">=</span> <span class="n">_makeCregsDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">numQubits</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkerDag</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">())</span>
+
+        <span class="n">qbits1</span> <span class="o">=</span> <span class="n">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas1</span><span class="p">)</span>
+        <span class="n">qbits2</span> <span class="o">=</span> <span class="n">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas2</span><span class="p">)</span>
+
+        <span class="n">dag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">getEncoderDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span> <span class="n">qregs</span><span class="p">,</span> <span class="n">cregs1</span><span class="p">,</span> <span class="n">ancillas1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_numRepeats</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">)):</span>
+                <span class="n">dag</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_checkerDag</span><span class="p">,</span> <span class="n">qubits</span> <span class="o">=</span> <span class="n">qbits2</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">clbits</span> <span class="o">=</span> <span class="n">cregs2</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_checkerDag</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">()):</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_correctVal</span><span class="p">:</span>
+                        <span class="n">dag</span><span class="o">.</span><span class="n">apply_operation_back</span><span class="p">(</span><span class="n">Reset</span><span class="p">()</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">cregs2</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">k</span><span class="p">),</span><span class="n">qbits1</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+                        <span class="n">dag</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">_encoderCircuit</span><span class="o">.</span><span class="n">to_instruction</span><span class="p">()</span><span class="o">.</span><span class="n">c_if</span><span class="p">(</span><span class="n">cregs2</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">k</span><span class="p">),</span> <span class="n">qbits1</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">cregs1</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">)):</span>
+            <span class="n">dag</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_checkerDag</span><span class="p">,</span> <span class="n">qubits</span> <span class="o">=</span> <span class="n">qbits2</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">clbits</span> <span class="o">=</span> <span class="n">cregs2</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">dag</span></div></div>
+
+
+<div class="viewcode-block" id="SyndromeDetector"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.SyndromeDetector">[docs]</a><span class="k">class</span> <span class="nc">SyndromeDetector</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for implementing non-fault tolerant syndrome detection for an arbitrary error correction scheme.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    detectorCircuit : QuantumCircuit</span>
+<span class="sd">        A Quantum Circuit implementing non-fault tolerant syndrome detection.</span>
+<span class="sd">    numAncillas : int</span>
+<span class="sd">        The number of ancilla qubits used in the syndrome detection.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    syndromeDetectCircuit :</span>
+<span class="sd">        Implements syndrome detection for the given circuit.</span>
+<span class="sd">    syndromeDetectDag :</span>
+<span class="sd">        Implements syndrome detection for the given DAG.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detectorCircuit</span><span class="p">,</span> <span class="n">numAncillas</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_detectorCircuit</span> <span class="o">=</span> <span class="n">detectorCircuit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_detectorDag</span> <span class="o">=</span> <span class="n">circuit_to_dag</span><span class="p">(</span><span class="n">detectorCircuit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numMeasurements</span> <span class="o">=</span> <span class="n">detectorCircuit</span><span class="o">.</span><span class="n">num_clbits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span> <span class="o">=</span> <span class="n">numAncillas</span>
+
+<div class="viewcode-block" id="SyndromeDetector.syndromeDetectCircuit"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.SyndromeDetector.syndromeDetectCircuit">[docs]</a>    <span class="k">def</span> <span class="nf">syndromeDetectCircuit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">circuit</span><span class="p">,</span> <span class="n">qregs</span><span class="p">,</span> <span class="n">cregs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ancillas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates gates implementing non-fault tolerant syndrome detection for the given qubits in the given circuit.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        circuit : QuantumCircuit</span>
+<span class="sd">            The circuit for which to perform syndrome detection.</span>
+<span class="sd">        qregs : list(QuantumRegister)</span>
+<span class="sd">            The Quantum Registers to on which to perform syndrome detection.</span>
+<span class="sd">        cregs : list(ClassicalRegister), Optional</span>
+<span class="sd">            The Classical Registers used to perform syndrome detection, if classical registers are needed. If ``cregs`` is provided, it must satisfy ``len(cregs) == len(qregs)`` and the syndrome detection process for the ``qregs[i]`` quantum register will use the ``cregs[i]`` classical register.</span>
+<span class="sd">        ancillas : list(AncillaRegister), list(QuantumRegister), Optional</span>
+<span class="sd">            The Ancilla Registers used to perform syndrome detection,, if ancilla registers are needed. If ``ancillas`` is provided, it must satisfy ``len(ancillas) == len(cregs) == len(qregs)`` and the syndrome detection process for the ``qregs[i]`` quantum register will use the ``ancillas[i]`` ancilla register.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_detectorCircuit</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">circuit</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">cregs</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cregs</span> <span class="o">=</span> <span class="n">_makeCregsCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">_numMeasurements</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">ancillas</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ancillas</span> <span class="o">=</span> <span class="n">_makeAncillasCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+        
+        <span class="n">qbits</span> <span class="o">=</span> <span class="n">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">)):</span>
+            <span class="n">circuit</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_detectorCircuit</span><span class="p">,</span> <span class="n">qbits</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cregs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ancillas</span><span class="p">)):</span>
+            <span class="n">circuit</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">ancillas</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        
+        <span class="k">return</span> <span class="n">circuit</span></div>
+
+<div class="viewcode-block" id="SyndromeDetector.syndromeDetectDag"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.SyndromeDetector.syndromeDetectDag">[docs]</a>    <span class="k">def</span> <span class="nf">syndromeDetectDag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dag</span><span class="p">,</span> <span class="n">qregs</span><span class="p">,</span> <span class="n">cregs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ancillas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates gates implementing non-fault tolerant syndrome detection for the given qubits in the given DAG.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dag : DAGCircuit</span>
+<span class="sd">            The DAG for which to perform syndrome detection.</span>
+<span class="sd">        qregs : list(QuantumRegister)</span>
+<span class="sd">            The Quantum Registers to on which to perform syndrome detection.</span>
+<span class="sd">        cregs : list(ClassicalRegister), Optional</span>
+<span class="sd">            The Classical Registers used to perform syndrome detection, if classical registers are needed. If ``cregs`` is provided, it must satisfy ``len(cregs) == len(qregs)`` and the syndrome detection process for the ``qregs[i]`` quantum register will use the ``cregs[i]`` classical register.</span>
+<span class="sd">        ancillas : list(AncillaRegister), list(QuantumRegister), Optional</span>
+<span class="sd">            The Ancilla Registers used to perform syndrome detection,, if ancilla registers are needed. If ``ancillas`` is provided, it must satisfy ``len(ancillas) == len(cregs) == len(qregs)`` and the syndrome detection process for the ``qregs[i]`` quantum register will use the ``ancillas[i]`` ancilla register.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_detectorDag</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1">#dag = dag.copy()</span>
+
+        <span class="k">if</span> <span class="n">cregs</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cregs</span> <span class="o">=</span> <span class="n">_makeCregsDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">_numMeasurements</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ancillas</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ancillas</span> <span class="o">=</span> <span class="n">_makeAncillasDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+
+        <span class="n">qbits</span> <span class="o">=</span> <span class="n">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">)):</span>
+            <span class="n">dag</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_detectorDag</span><span class="p">,</span> <span class="n">qubits</span> <span class="o">=</span> <span class="n">qbits</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">clbits</span> <span class="o">=</span> <span class="n">cregs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ancillas</span><span class="p">)):</span>
+            <span class="n">dag</span><span class="o">.</span><span class="n">apply_operation_back</span><span class="p">(</span><span class="n">Reset</span><span class="p">(),</span><span class="n">ancillas</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        
+        <span class="k">return</span> <span class="n">dag</span></div></div>
+            
+<div class="viewcode-block" id="SyndromeCorrector"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.SyndromeCorrector">[docs]</a><span class="k">class</span> <span class="nc">SyndromeCorrector</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for implementing fault tolerant syndrome correction for an arbitrary error correction scheme.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    correctorCircuit : QuantumCircuit</span>
+<span class="sd">        A Quantum Circuit implementing fault tolerant syndrome correction for a single qubit.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    syndromeCorrectCircuit :</span>
+<span class="sd">        Implements syndrome correction for the given circuit.</span>
+<span class="sd">    syndromeCorrectDag :</span>
+<span class="sd">        Implements syndrome correction for the given DAG.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">correctorCircuit</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_correctorCircuit</span> <span class="o">=</span> <span class="n">correctorCircuit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_correctorDag</span> <span class="o">=</span> <span class="n">circuit_to_dag</span><span class="p">(</span><span class="n">correctorCircuit</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SyndromeCorrector.syndromeCorrectCircuit"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.SyndromeCorrector.syndromeCorrectCircuit">[docs]</a>    <span class="k">def</span> <span class="nf">syndromeCorrectCircuit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">circuit</span><span class="p">,</span> <span class="n">qregs</span><span class="p">,</span> <span class="n">cregs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates gates implementing fault tolerant syndrome correction for the given qubits in the given circuit.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        circuit : QuantumCircuit</span>
+<span class="sd">            The circuit for which to perform syndrome correction.</span>
+<span class="sd">        qregs : list(QuantumRegister)</span>
+<span class="sd">            The Quantum Registers to on which to perform syndrome correction.</span>
+<span class="sd">        cregs : list(ClassicalRegister)</span>
+<span class="sd">            The Classical Registers used to perform syndrome correction, if classical registers are needed. If ``cregs`` is provided, it must satisfy ``len(cregs) == len(qregs)`` and the syndrome correction process for the ``qregs[i]`` quantum register will use the ``cregs[i]`` classical register.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_correctorCircuit</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">circuit</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">)):</span>
+            <span class="n">circuit</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_correctorCircuit</span><span class="p">,</span> <span class="n">qregs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cregs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">circuit</span></div>
+
+<div class="viewcode-block" id="SyndromeCorrector.syndromeCorrectDag"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.SyndromeCorrector.syndromeCorrectDag">[docs]</a>    <span class="k">def</span> <span class="nf">syndromeCorrectDag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dag</span><span class="p">,</span> <span class="n">qregs</span><span class="p">,</span> <span class="n">cregs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates gates implementing fault tolerant syndrome correction for the given qubits in the given DAG.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dag : DAGCircuit</span>
+<span class="sd">            The dag for which to perform syndrome correction.</span>
+<span class="sd">        qregs : list(QuantumRegister)</span>
+<span class="sd">            The Quantum Registers to on which to perform syndrome correction.</span>
+<span class="sd">        cregs : list(ClassicalRegister)</span>
+<span class="sd">            The Classical Registers used to perform syndrome correction, if classical registers are needed. If ``cregs`` is provided, it must satisfy ``len(cregs) == len(qregs)`` and the syndrome correction process for the ``qregs[i]`` quantum register will use the ``cregs[i]`` classical register.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_correctorDag</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1">#dag = dag.copy()</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">)):</span>
+            <span class="n">dag</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_correctorDag</span><span class="p">,</span> <span class="n">qubits</span> <span class="o">=</span> <span class="n">qregs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">clbits</span> <span class="o">=</span> <span class="n">cregs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">dag</span></div></div>
+
+<div class="viewcode-block" id="ErrorCorrector"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.ErrorCorrector">[docs]</a><span class="k">class</span> <span class="nc">ErrorCorrector</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for implementing non-fault tolerant error correction (syndrome detection and correction) for an arbitrary error correction scheme.</span>
+<span class="sd">    This class combines :class:`SyndromeDetection` and :class:`SyndromeCorrection` into a single class for ease of use.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    syndromeDetector : SyndromeDetector</span>
+<span class="sd">        An object representing syndrome detection.</span>
+<span class="sd">    syndromeCorrector : SyndromeCorrector</span>
+<span class="sd">        An object representing syndrome correction.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    errorCorrectCircuit :</span>
+<span class="sd">        Implements error correction for the given circuit.</span>
+<span class="sd">    errorCorrecDag :</span>
+<span class="sd">        Implements error correction for the given DAG.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">syndromeDetector</span><span class="p">,</span><span class="n">syndromeCorrector</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_syndromeDetector</span> <span class="o">=</span> <span class="n">syndromeDetector</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_syndromeCorrector</span> <span class="o">=</span> <span class="n">syndromeCorrector</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numMeasurements</span> <span class="o">=</span> <span class="n">syndromeDetector</span><span class="o">.</span><span class="n">_numMeasurements</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span> <span class="o">=</span> <span class="n">syndromeDetector</span><span class="o">.</span><span class="n">_numAncillas</span>
+
+<div class="viewcode-block" id="ErrorCorrector.errorCorrectCircuit"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.ErrorCorrector.errorCorrectCircuit">[docs]</a>    <span class="k">def</span> <span class="nf">errorCorrectCircuit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">circuit</span><span class="p">,</span> <span class="n">qregs</span><span class="p">,</span> <span class="n">cregs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ancillas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates gates implementing fault tolerant error correction for the given qubits in the given circuit.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        circuit : QuantumCircuit</span>
+<span class="sd">            The circuit for which to perform error correction.</span>
+<span class="sd">        qregs : list(QuantumRegister)</span>
+<span class="sd">            The Quantum Registers to on which to perform error correction.</span>
+<span class="sd">        cregs : list(ClassicalRegister)</span>
+<span class="sd">            The Classical Registers used to perform error correction, if classical registers are needed. If ``cregs`` is provided, it must satisfy ``len(cregs) == len(qregs)`` and the syndrome correction process for the ``qregs[i]`` quantum register will use the ``cregs[i]`` classical register.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_syndromeDetector</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_syndromeCorrector</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">circuit</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">cregs</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cregs</span> <span class="o">=</span> <span class="n">_makeCregsCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">_numMeasurements</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">ancillas</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ancillas</span> <span class="o">=</span> <span class="n">_makeAncillasCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+
+        <span class="n">circuit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_syndromeDetector</span><span class="o">.</span><span class="n">syndromeDetectCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span><span class="n">qregs</span><span class="p">,</span><span class="n">cregs</span><span class="p">,</span><span class="n">ancillas</span><span class="p">)</span>
+        <span class="n">circuit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_syndromeCorrector</span><span class="o">.</span><span class="n">syndromeCorrectCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span><span class="n">qregs</span><span class="p">,</span><span class="n">cregs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">circuit</span></div>
+
+<div class="viewcode-block" id="ErrorCorrector.errorCorrectDag"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.ErrorCorrector.errorCorrectDag">[docs]</a>    <span class="k">def</span> <span class="nf">errorCorrectDag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dag</span><span class="p">,</span> <span class="n">qregs</span><span class="p">,</span> <span class="n">cregs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ancillas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates gates implementing non-fault tolerant error correction for the given qubits in the given DAG.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dag : DAGCircuit</span>
+<span class="sd">            The dag for which to perform error correction.</span>
+<span class="sd">        qregs : list(QuantumRegister)</span>
+<span class="sd">            The Quantum Registers to on which to perform error correction.</span>
+<span class="sd">        cregs : list(ClassicalRegister)</span>
+<span class="sd">            The Classical Registers used to perform error correction, if classical registers are needed. If ``cregs`` is provided, it must satisfy ``len(cregs) == len(qregs)`` and the syndrome correction process for the ``qregs[i]`` quantum register will use the ``cregs[i]`` classical register.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_syndromeDetector</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_syndromeCorrector</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">cregs</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cregs</span> <span class="o">=</span> <span class="n">_makeCregsDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">_numMeasurements</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ancillas</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ancillas</span> <span class="o">=</span> <span class="n">_makeAncillasDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">_numAncillas</span><span class="p">)</span>
+
+        <span class="n">dag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_syndromeDetector</span><span class="o">.</span><span class="n">syndromeDetectDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span><span class="n">qregs</span><span class="p">,</span><span class="n">cregs</span><span class="p">,</span><span class="n">ancillas</span><span class="p">)</span>
+        <span class="n">dag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_syndromeCorrector</span><span class="o">.</span><span class="n">syndromeCorrectDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span><span class="n">qregs</span><span class="p">,</span><span class="n">cregs</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">dag</span></div></div>
+
+<div class="viewcode-block" id="FaultTolerantGates"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.FaultTolerantGates">[docs]</a><span class="k">class</span> <span class="nc">FaultTolerantGates</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for implementing fault tolerant gates for an arbitrary quantum error correction code.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gatesToCircuit : map(str, (QuantumCircuit, int))</span>
+<span class="sd">        A map representing conversions between gates and circuits implementing fault tolerant versions of those gates. </span>
+<span class="sd">        The keys of the map are the QASM label for the gate in question, given by ``gate.qasm()``.</span>
+<span class="sd">        The outputs of the map are tuples of the form ``(circuit, numAncillas)``, where ``circuit`` is a fault-tolerant implementation of a gate and ``numAncillas`` is the number of ancillas qubits used in the fault-tolerant implementation of the gate.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    addGateCircuit :</span>
+<span class="sd">        Adds a fault tolerant gate to the given circuit.</span>
+<span class="sd">    addGateDag :</span>
+<span class="sd">        Adds a fault tolerant gate to the given DAG.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gatesToCircuit</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gatesToCircuit</span> <span class="o">=</span> <span class="n">gatesToCircuit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gatesToDag</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">gate</span> <span class="ow">in</span> <span class="n">gatesToCircuit</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_gatesToDag</span><span class="p">[</span><span class="n">gate</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">circuit_to_dag</span><span class="p">(</span><span class="n">gatesToCircuit</span><span class="p">[</span><span class="n">gate</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span><span class="n">gatesToCircuit</span><span class="p">[</span><span class="n">gate</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_gates</span> <span class="o">=</span> <span class="p">[</span><span class="n">gate</span> <span class="k">for</span> <span class="n">gate</span> <span class="ow">in</span> <span class="n">gatesToCircuit</span><span class="p">]</span>
+
+<div class="viewcode-block" id="FaultTolerantGates.addGateCircuit"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.FaultTolerantGates.addGateCircuit">[docs]</a>    <span class="k">def</span> <span class="nf">addGateCircuit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">circuit</span><span class="p">,</span> <span class="n">gate</span><span class="p">,</span> <span class="n">qregs</span><span class="p">,</span> <span class="n">cregs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ancillas</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds the specified number of fault tolerant implementations of a quantum gate to the given circuit.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        circuit : QuantumCircuit</span>
+<span class="sd">            The circuit on which to perform the fault tolerant gate.</span>
+<span class="sd">        gate : Gate</span>
+<span class="sd">            The non-fault tolerant gate for which to implement a fault tolerant version.</span>
+<span class="sd">        qregs : list(list(QuantumRegister))</span>
+<span class="sd">            The Quantum Registers to on which to perform the fault tolerant gate. Each ``qregs[i]`` represents the list of quantum registers which correspond to the ith input to the non-fault tolerant version of the gate in question. Note that each ``qregs[i]`` must have the same length.</span>
+<span class="sd">        cregs : list(list(ClassicalRegister)), Optional</span>
+<span class="sd">            The Classical Registers used to perform syndrome detection, if classical registers are needed. If ``cregs`` is provided, it must satisfy ``len(cregs) == len(qregs[0])`` and the syndrome detection process for the ``qregs[i][j]`` quantum register will use the ``cregs[j]`` classical register.</span>
+<span class="sd">        ancillas : list(list(AncillaRegister)), list(list(QuantumRegister)), Optional</span>
+<span class="sd">            The Ancilla Registers used to perform syndrome detection,, if ancilla registers are needed. If ``ancillas`` is provided, it must satisfy ``len(ancillas) == len(qregs[0])`` and the syndrome detection process for the ``qregs[i][j]`` quantum register will use the ``ancillas[j]`` ancilla register.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gates</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gatesToCircuit</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">gate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gatesToCircuit</span><span class="p">[</span><span class="n">gate</span><span class="o">.</span><span class="n">qasm</span><span class="p">()]</span>
+        
+        <span class="n">circuit</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">cregs</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cregs</span> <span class="o">=</span> <span class="n">_makeCregsCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="n">gate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;classical&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">ancillas</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ancillas</span> <span class="o">=</span> <span class="n">_makeAncillasCircuit</span><span class="p">(</span><span class="n">circuit</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="n">gate</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        
+        <span class="n">qbits</span> <span class="o">=</span> <span class="n">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas</span><span class="p">,</span><span class="n">singleQbit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qbits</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">gate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">num_clbits</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">circuit</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="n">gate</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">qbits</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cregs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">circuit</span> <span class="o">=</span> <span class="n">circuit</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="n">gate</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">qbits</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">circuit</span></div>
+
+<div class="viewcode-block" id="FaultTolerantGates.addGateDag"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.FaultTolerantGates.addGateDag">[docs]</a>    <span class="k">def</span> <span class="nf">addGateDag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dag</span><span class="p">,</span> <span class="n">gate</span><span class="p">,</span> <span class="n">qregs</span><span class="p">,</span> <span class="n">cregs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">ancillas</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds the specified number of fault tolerant implementations of a quantum gate to the given DAG.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dag : DAGCircuit</span>
+<span class="sd">            The dag on which to perform the fault tolerant gate.</span>
+<span class="sd">        gate : Gate</span>
+<span class="sd">            The non-fault tolerant gate for which to implement a fault tolerant version.</span>
+<span class="sd">        qregs : list(list(QuantumRegister))</span>
+<span class="sd">            The Quantum Registers to on which to perform the fault tolerant gate. Each ``qregs[i]`` represents the list of quantum registers which correspond to the ith input to the non-fault tolerant version of the gate in question. Note that each ``qregs[i]`` must have the same length.</span>
+<span class="sd">        cregs : list(list(ClassicalRegister)), Optional</span>
+<span class="sd">            The Classical Registers used to perform syndrome detection, if classical registers are needed. If ``cregs`` is provided, it must satisfy ``len(cregs) == len(qregs[0])`` and the syndrome detection process for the ``qregs[i][j]`` quantum register will use the ``cregs[j]`` classical register.</span>
+<span class="sd">        ancillas : list(list(AncillaRegister)), list(list(QuantumRegister)), Optional</span>
+<span class="sd">            The Ancilla Registers used to perform syndrome detection,, if ancilla registers are needed. If ``ancillas`` is provided, it must satisfy ``len(ancillas) == len(qregs[0])`` and the syndrome detection process for the ``qregs[i][j]`` quantum register will use the ``ancillas[j]`` ancilla register.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gates</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gatesToDag</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        
+        <span class="n">gate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gatesToDag</span><span class="p">[</span><span class="n">gate</span><span class="o">.</span><span class="n">qasm</span><span class="p">()]</span>
+
+        <span class="k">if</span> <span class="n">cregs</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cregs</span> <span class="o">=</span> <span class="n">_makeCregsDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="n">gate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">(),</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;classical&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">ancillas</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ancillas</span> <span class="o">=</span> <span class="n">_makeAncillasDag</span><span class="p">(</span><span class="n">dag</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">qregs</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span><span class="n">gate</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        
+        <span class="n">qbits</span> <span class="o">=</span> <span class="n">_combineQregsAncillas</span><span class="p">(</span><span class="n">qregs</span><span class="p">,</span><span class="n">ancillas</span><span class="p">,</span><span class="n">singleQbit</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qbits</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">gate</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">num_clbits</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dag</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="n">gate</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">qubits</span> <span class="o">=</span> <span class="n">qbits</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">clbits</span> <span class="o">=</span> <span class="n">cregs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dag</span><span class="o">.</span><span class="n">compose</span><span class="p">(</span><span class="n">gate</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">qubits</span> <span class="o">=</span> <span class="n">qbits</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">dag</span></div></div>
+        
+
+<div class="viewcode-block" id="BaseFaultTolerantMeasurement"><a class="viewcode-back" href="../Base.html#BaseFaultTolerance.BaseFaultTolerantMeasurement">[docs]</a><span class="k">class</span> <span class="nc">BaseFaultTolerantMeasurement</span><span class="p">(</span><span class="n">TransformationPass</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class for implementing fault-tolerant measurement. NOT YET IMPLEMENTED.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">QiskiFT 1.0.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">BaseFaultTolerance</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Owen Dugan.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.0.
+    </div>
+  </body>
+</html>
